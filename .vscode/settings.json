@@ -1,0 +1,13 @@
+{
+	"Lua.runtime.version": "Lua 5.3",
+	"Lua.runtime.pathStrict": true,
+	"Lua.workspace.checkThirdParty": false,
+	"Lua.runtime.path": [
+		"?.lua",
+		"?/init.lua"
+	],
+	"Lua.diagnostics.globals": [
+		"modules"
+	],
+	"Lua.diagnostics.ignoredFiles": "Opened"
+}
