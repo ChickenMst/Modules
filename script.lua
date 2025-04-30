@@ -7,6 +7,8 @@ end
 --- Called every game tick
 ---@param game_ticks number the number of ticks since the last onTick call (normally 1, while sleeping 400.)
 function onTick(game_ticks)
+	require "modules"
+	require "modules.addons"
 	require "modules.addons.e"
 end
 
