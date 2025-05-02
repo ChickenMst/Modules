@@ -1,5 +1,3 @@
-modules.addons.e = {}
-
 function modules.addons.e:print(...)
     local args = {...}
     local str = ""
