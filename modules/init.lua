@@ -8,5 +8,6 @@ require "modules.addons" -- load the addons
 -- run the tick function for all modules
 ---@usage modules:Tick()
 function modules:Tick()
+    modules.services:TickServices()
     modules.addons:TickAddons()
 end
