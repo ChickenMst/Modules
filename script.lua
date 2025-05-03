@@ -2,7 +2,7 @@ require "modules"
 --- Called when the script is initialized (whenever creating or loading a world.)
 ---@param is_world_create boolean Only returns true when the world is first created.
 function onCreate(is_world_create)
-	modules.main.libraries.logging:info("onCreate()", "Script loaded")
+	modules.libraries.logging:info("onCreate()", "Script loaded")
 end
 
 --- Called every game tick
