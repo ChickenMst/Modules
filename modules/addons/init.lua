@@ -1,6 +1,7 @@
 -- init addons table
 modules.addons = {}
 
+
 modules.addons.createdAddons = {} -- table of created addons
 modules.addons.loadedAddons = {} -- table of addons that are actively loaded
 
@@ -27,5 +28,4 @@ end
 
 -- tick addons tick function
 function modules.addons:TickAddons()
-
 end
