@@ -14,3 +14,7 @@ end
 --- Called when the world is exited.
 function onDestroy()
 end
+
+modules.libraries.callbacks:connect("onChatMessage", function(peer_id, sender_name, message)
+	modules.libraries.logging:info("onChatMessage()", "Player: " .. sender_name .. " sent a message: " .. message)
+end)
