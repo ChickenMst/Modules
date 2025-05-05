@@ -1,5 +1,10 @@
 modules.classes.addon = {} -- table of addon functions
 
+---@param name string
+---@param version string|number
+---@param author string
+---@param description string
+---@return table
 function modules.classes.addon:create(name, version, author, description)
     local addon = {
         name = name,
