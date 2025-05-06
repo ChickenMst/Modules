@@ -9,5 +9,8 @@
 	"Lua.diagnostics.globals": [
 		"modules"
 	],
-	"Lua.diagnostics.ignoredFiles": "Opened"
+	"Lua.diagnostics.ignoredFiles": "Opened",
+	"Lua.diagnostics.disable": [
+		"lowercase-global"
+	]
 }

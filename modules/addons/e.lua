@@ -1,8 +1,10 @@
-function modules.addons.e:print(...)
-    local args = {...}
-    local str = ""
-    for i, v in ipairs(args) do
-        str = str .. tostring(v) .. " "
+local addon = modules.libraries.addons:create("e",1,"aussieworks","Addon e")
+addon.connect(function()
+    init = function()
+        modules.libraries.logging:info("init()", "Addon e initialized")
     end
-    debug.log(str)
-end
+    modules.libraries.logging:info("Addon loaded", "Addon e has been loaded successfully.")
+end)
+
+modules.libraries.addons:connect("e", addon) -- connect the addon to the addons table
+modules.libraries.addons:enable("e") -- enable the addon
