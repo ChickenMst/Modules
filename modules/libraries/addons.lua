@@ -29,7 +29,7 @@ end
 ---@param name string
 function modules.libraries.addons:enable(name)
     if self.addons[name] then
-        self.addons[name].enable() -- enable the addon
+        self.addons[name]:enable() -- enable the addon
     else
         modules.libraries.logging:error("modules.libraries.addons:enable()", "Addon " .. name .. " does not exist") -- print an error to the console
     end
@@ -38,7 +38,7 @@ end
 ---@param name string
 function modules.libraries.addons:disable(name)
     if self.addons[name] then
-        self.addons[name].disable() -- disable the addon
+        self.addons[name]:disable() -- disable the addon
     else
         modules.libraries.logging:error("modules.libraries.addons:disable()", "Addon " .. name .. " does not exist") -- print an error to the console
     end

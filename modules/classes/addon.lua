@@ -12,17 +12,24 @@ function modules.classes.addon:create(name, version, author, description)
         author = author,
         description = description,
         enabled = true,
-        func = {},
-        connect = function(func)
-            self.func = func -- set the function to the addon
-        end,
-        enable = function()
-            self.enabled = true
-        end,
-        disable = function()
-            self.enabled = false
-        end
+        func = {}
     }
+
+    -- will override functions inside addon if ran a func alread exists
+    ---@param func function
+    function addon:connect(func)
+        self.func = func -- set the function to the addon
+    end
+
+    -- enables the addon so it can get run
+    function addon:enable()
+        self.enabled = true
+    end
+
+    -- disables addon so it doesnt get run
+    function addon:disable()
+        self.enabled = false
+    end
 
     return addon
 end
