@@ -8,7 +8,7 @@ function modules.libraries.addons:create(...)
 end
 
 ---@param name string
----@param addon table
+---@param addon table | function
 function modules.libraries.addons:connect(name, addon)
     if not self.addons[name] then
         self.addons[name] = addon -- add the addon to the addons table

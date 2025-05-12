@@ -1,6 +1,6 @@
 modules.libraries.logging = {} -- table of logging functions
 
-modules.libraries.logging.logs = {} -- table of logging functions
+modules.libraries.logging.logs = {} -- table of logs
 
 modules.libraries.logging.logtypes = {
     INFO = "INFO",
