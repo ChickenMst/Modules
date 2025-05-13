@@ -1,8 +1,8 @@
 modules.classes.event = {} -- table of event functions
 
----@return event
+---@return Event
 function modules.classes.event:create()
-    ---@class event
+    ---@class Event
     local event = {
         listeners = {},
     }

@@ -2,14 +2,14 @@ modules.libraries.addons = {} -- table of addon functions
 
 modules.libraries.addons.addons = {} -- table of addons
 
----@return addon
+---@return Addon
 function modules.libraries.addons:create(...)
     local addon = modules.classes.addon:create(...)
     return addon
 end
 
 ---@param name string
----@param addon addon
+---@param addon Addon
 function modules.libraries.addons:connect(name, addon)
     if not self.addons[name] then
         self.addons[name] = addon -- add the addon to the addons table
