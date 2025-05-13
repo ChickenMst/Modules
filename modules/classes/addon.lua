@@ -4,8 +4,9 @@ modules.classes.addon = {} -- table of addon functions
 ---@param version string|number
 ---@param author string
 ---@param description string
----@return table
+---@return addon
 function modules.classes.addon:create(name, version, author, description)
+    ---@class addon
     local addon = {
         name = name,
         version = version,
@@ -16,7 +17,7 @@ function modules.classes.addon:create(name, version, author, description)
     }
 
     -- will override functions inside addon if ran a func alread exists
-    ---@param func function
+    ---@param func table
     function addon:connect(func)
         self.func = func -- set the function to the addon
     end
