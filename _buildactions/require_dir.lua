@@ -29,9 +29,8 @@ local BuildActions = {}
 ---@param project SSSWTool.Project
 ---@param path string
 ---@param ast SelenScript.ASTNodes.Source # Any changes to the AST will be cached!
----@param errors SelenScript.Error[]
 ---@param comments (SelenScript.ASTNodes.LineComment|SelenScript.ASTNodes.LongComment)[]
-function BuildActions.post_parse(multiproject, project, path, ast, errors, comments)
+function BuildActions.post_file(multiproject, project, path, ast, comments)
 	local parser = project:get_parser()
 	if not parser then return end
 
@@ -93,6 +92,10 @@ function BuildActions.post_parse(multiproject, project, path, ast, errors, comme
 				name = AvPath.name(AvPath.base(sub_src_path))
 			end
 			name = name:gsub("%.lua$", "")
+			-- If the name contains any dots after removing the .lua extension, it can't be required.
+			if name:find("%.") then
+				goto continue
+			end
 			--                           Remove extension   Remove ./           Slashes to dots
 			local modpath = sub_src_path:gsub("%.lua$", ""):gsub("%.[\\/]", ""):gsub("[\\/]", ".")
 			local require_node = assert(project:parse_raw(("require(\"%s\")"):format(modpath))).block.block[1]
