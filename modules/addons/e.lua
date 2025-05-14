@@ -8,6 +8,7 @@ function addonfunc:init()
             modules.libraries.logging:info("e()", "Player: " .. sender_name .. " sent a message: " .. message)
         end
     end)
+
     return true
 end
 

@@ -100,13 +100,14 @@ function BuildActions.post_file(multiproject, project, path, ast, comments)
 			local modpath = sub_src_path:gsub("%.lua$", ""):gsub("%.[\\/]", ""):gsub("[\\/]", ".")
 			local require_node = assert(project:parse_raw(("require(\"%s\")"):format(modpath))).block.block[1]
 			---@cast require_node SelenScript.ASTNodes.index
+			-- note the below inserts using `#block`, this is inserting second to last in the block. 
 			if output_style == "normal" then
 				-- Insert the `require("x.y.z")` into the block.
-				table.insert(block, 2, require_node)
+				table.insert(block, #block, require_node)
 			else
 				-- Insert the `["z"] = require("x.y.z")` into the block.
 				-- We must do some manual formatting due to SelenScript not being able to parse specific parts of lua on demand (currently)
-				table.insert(block, 2, ASTNodesSpecial["OutputRaw"]{
+				table.insert(block, #block, ASTNodesSpecial["OutputRaw"]{
 					("[\"%s\"] = "):format(name), require_node, ","
 				})
 			end
