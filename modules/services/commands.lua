@@ -13,7 +13,6 @@ modules.libraries.callbacks:connect("onCustomCommand", function(full_message, pe
                 end
             end
         end
-    else
-        modules.libraries.logging:error("services.commands", "Command not found: " .. command)
+        modules.libraries.logging:warning("services.commands", "Command not found: " .. command)
     end
 end)
