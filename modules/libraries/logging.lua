@@ -48,7 +48,7 @@ end
 ---@return string logstring
 function modules.libraries.logging:_formatLog(log)
     local logstring = ""
-    logstring = logstring .. "[" .. log.type .. "] " .. log.title .. ": " .. log.message
+    logstring = string.format("[%s] %s: %s",log.type,log.title,log.message)
     return logstring
 end
 
