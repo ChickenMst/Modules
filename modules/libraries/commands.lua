@@ -1,5 +1,6 @@
 modules.libraries.commands = {} -- table of command functions
 
+---@type Command[]
 modules.libraries.commands.commands = {} -- table of commands
 
 ---@param commandstr string
@@ -8,6 +9,7 @@ modules.libraries.commands.commands = {} -- table of commands
 ---@param func function
 ---@return boolean
 function modules.libraries.commands:create(commandstr, alias, description, func)
+    commandstr = self:cleanCommandString(commandstr) -- clean command string
     -- check if command already exists
     local existing_command = self.commands[commandstr]
     if existing_command then
@@ -16,12 +18,11 @@ function modules.libraries.commands:create(commandstr, alias, description, func)
     end
 
     -- check if alias already exists
-    ---@param cmd Command
     for _, cmd in pairs(self.commands) do
         if type(cmd.alias) == "table" and type(alias) == "table" then
             for _, a in pairs(alias) do
                 for _, existing_a in pairs(cmd.alias) do
-                    if a == existing_a then
+                    if self:cleanCommandString(a) == self:cleanCommandString(existing_a) then
                         modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." for command: "..commandstr.." already exists.")
                         return false
                     end
