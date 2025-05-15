@@ -9,7 +9,7 @@ modules.libraries.logging.logtypes = {
     ERROR = 4,
 } -- table of log types
 
-modules.libraries.logging.loglevel = modules.libraries.logging.logtypes.WARNING -- set the default log level to ERROR
+modules.libraries.logging.loglevel = modules.libraries.logging.logtypes.DEBUG -- set the default log level to ERROR
 
 modules.libraries.logging.loggingmode = "chat" -- set the default log mode to console
 
@@ -52,6 +52,8 @@ function modules.libraries.logging:_formatLog(log)
     return logstring
 end
 
+-- turn the log level into a string for easy access
+---@param loglevel number
 function modules.libraries.logging:_logLevelToString(loglevel)
     if loglevel == self.logtypes.INFO then
         return "INFO"
