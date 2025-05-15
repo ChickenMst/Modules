@@ -24,7 +24,7 @@ function modules.libraries.logging:log(logtype, title, message)
     if self.loggingmode == "console" then
         debug.log(formattedlog) -- print the log to the console
     elseif self.loggingmode == "chat" and logtype >= self.loglevel then
-        modules.libraries.chat:announce("[Server]: Auscode",formattedlog) -- print the log to the chat
+        modules.libraries.chat:announce("[Server]: Modules",formattedlog) -- print the log to the chat
     elseif self.loggingmode ~= "console" and self.loggingmode ~= "chat" then
         self:error("Logging", "Invalid logging mode: " .. self.loggingmode) -- print an error to the console
     end
@@ -65,6 +65,21 @@ function modules.libraries.logging:_logLevelToString(loglevel)
         return "DEBUG"
     else
         return "UNKNOWN"
+    end
+end
+
+function modules.libraries.logging:setLogLevel(state)
+    if state then
+        state = state:upper() -- make the state lowercase
+    else
+        modules.libraries.logging:error("libraries.logging", "log level cannot be nil") -- print an error to the console
+        return
+    end
+    if self.logtypes[state] then
+        self.loglevel = self.logtypes[state] -- set the log level to the state
+        self:info("libraries.logging", "Log level set to " .. state) -- print the log level to the console
+    else
+        self:error("libraries.logging", "Invalid log level: " .. state)
     end
 end
 

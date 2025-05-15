@@ -44,7 +44,7 @@ end
 function modules.libraries.commands:enable(commandstr)
     if self.commands[commandstr] then
         self.commands[commandstr]:enable()
-        modules.libraries.logging:info("libraries.commands", "Command enabled: " .. commandstr)
+        modules.libraries.logging:debug("libraries.commands", "Command enabled: " .. commandstr)
     else
         modules.libraries.logging:warning("libraries.commands", "Command not found: " .. commandstr)
     end
@@ -55,7 +55,7 @@ end
 function modules.libraries.commands:disable(commandstr)
     if self.commands[commandstr] then
         self.commands[commandstr]:disable()
-        modules.libraries.logging:info("libraries.commands", "Command disabled: " .. commandstr)
+        modules.libraries.logging:debug("libraries.commands", "Command disabled: " .. commandstr)
     else
         modules.libraries.logging:warning("libraries.commands", "Command not found: " .. commandstr)
     end
@@ -66,7 +66,7 @@ end
 function modules.libraries.commands:remove(commandstr)
     if self.commands[commandstr] then
         self.commands[commandstr] = nil
-        modules.libraries.logging:info("libraries.commands", "Command removed: " .. commandstr)
+        modules.libraries.logging:debug("libraries.commands", "Command removed: " .. commandstr)
     else
         modules.libraries.logging:warning("libraries.commands", "Command not found: " .. commandstr)
     end
