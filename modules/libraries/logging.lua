@@ -24,7 +24,7 @@ function modules.libraries.logging:log(logtype, title, message)
     if self.loggingmode == "console" then
         debug.log(formattedlog) -- print the log to the console
     elseif self.loggingmode == "chat" and logtype >= self.loglevel then
-        modules.libraries.chat:announce("[Server]: Modules",formattedlog) -- print the log to the chat
+        modules.libraries.chat:announce("Modules",formattedlog) -- print the log to the chat
     elseif self.loggingmode ~= "console" and self.loggingmode ~= "chat" then
         self:error("Logging", "Invalid logging mode: " .. self.loggingmode) -- print an error to the console
     end
