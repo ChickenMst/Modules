@@ -3,29 +3,29 @@ modules.libraries.logging = {} -- table of logging functions
 modules.libraries.logging.logs = {} -- table of logs
 
 modules.libraries.logging.logtypes = {
-    INFO = "INFO",
-    WARNING = "WARNING",
-    ERROR = "ERROR",
-    DEBUG = "DEBUG",
+    DEBUG = 1,
+    INFO = 2,
+    WARNING = 3,
+    ERROR = 4,
 } -- table of log types
 
-modules.libraries.logging.loglevel = modules.libraries.logging.logtypes.ERROR -- set the default log level to ERROR
+modules.libraries.logging.loglevel = modules.libraries.logging.logtypes.WARNING -- set the default log level to ERROR
 
 modules.libraries.logging.loggingmode = "chat" -- set the default log mode to console
 
----@param logtype string
+---@param logtype number
 ---@param title string
 ---@param message string
 function modules.libraries.logging:log(logtype, title, message)
-    local bundledlog = self:_bundleLog(logtype, title, message) -- bundle the log into a table for easy access
+    local bundledlog = self:_bundleLog(self:_logLevelToString(logtype), title, message) -- bundle the log into a table for easy access
     local formattedlog = self:_formatLog(bundledlog) -- format the log into a string for easy access
     table.insert(self.logs, bundledlog) -- add the log to the logs table
-    
+
     if self.loggingmode == "console" then
         debug.log(formattedlog) -- print the log to the console
-    elseif self.loggingmode == "chat" then
+    elseif self.loggingmode == "chat" and logtype >= self.loglevel then
         modules.libraries.chat:announce("[Server]: Auscode",formattedlog) -- print the log to the chat
-    else
+    elseif self.loggingmode ~= "console" and self.loggingmode ~= "chat" then
         self:error("Logging", "Invalid logging mode: " .. self.loggingmode) -- print an error to the console
     end
 end
@@ -50,6 +50,20 @@ function modules.libraries.logging:_formatLog(log)
     local logstring = ""
     logstring = logstring .. "[" .. log.type .. "] " .. log.title .. ": " .. log.message
     return logstring
+end
+
+function modules.libraries.logging:_logLevelToString(loglevel)
+    if loglevel == self.logtypes.INFO then
+        return "INFO"
+    elseif loglevel == self.logtypes.WARNING then
+        return "WARNING"
+    elseif loglevel == self.logtypes.ERROR then
+        return "ERROR"
+    elseif loglevel == self.logtypes.DEBUG then
+        return "DEBUG"
+    else
+        return "UNKNOWN"
+    end
 end
 
 ---@param title string
