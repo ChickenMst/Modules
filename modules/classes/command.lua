@@ -1,14 +1,14 @@
 modules.classes.command = {} -- table of command functions
 
----@param maincommand string
+---@param commandstr string
 ---@param alias table
 ---@param description string
----@param func any
+---@param func function
 ---@return Command
-function modules.classes.command:create(maincommand, alias, description, func)
+function modules.classes.command:create(commandstr, alias, description, func)
     ---@class Command
     local command = {
-        maincommand = maincommand,
+        commandstr = commandstr,
         alias = alias,
         description = description,
         func = func,
@@ -23,6 +23,15 @@ function modules.classes.command:create(maincommand, alias, description, func)
     -- disables command so it cant get run
     function command:disable()
         self.enabled = false
+    end
+
+    -- runs the command
+    function command:run(...)
+        if self.enabled then
+            self.func(...)
+        else
+            modules.libraries.logging:warning("libraries.commands", "Command is disabled: " .. self.commandstr)
+        end
     end
 
     return command
