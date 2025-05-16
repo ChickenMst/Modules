@@ -1,8 +1,6 @@
 modules.services.addons = {}
 
 modules.libraries.callbacks:connect("onCreate", function()
-    ---@param addon Addon
-    ---@param name string
     for name, addon in pairs(modules.libraries.addons.addons) do
         if addon.enabled then
             modules.libraries.logging:debug("services.addons", "Loading addon: "..name)

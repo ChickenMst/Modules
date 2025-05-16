@@ -1,5 +1,6 @@
 modules.libraries.addons = {} -- table of addon functions
 
+---@type table <string, Addon>
 modules.libraries.addons.addons = {} -- table of addons
 
 ---@return Addon
