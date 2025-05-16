@@ -9,10 +9,6 @@ function addonfunc:init()
         end
     end)
 
-    modules.services.loops:create(5, function()
-        modules.libraries.logging:info("e()", "This is a message from addon e")
-    end)
-
     return true
 end
 
