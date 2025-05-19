@@ -13,6 +13,8 @@ function modules.classes.event:create()
         hasFiredOnce = false,
     }
 
+    ---@param callback function
+    ---@return EventConnection
     function event:connect(callback)
         self.currentId = self.currentId + 1
 
@@ -29,8 +31,11 @@ function modules.classes.event:create()
         else
             self:_connectionFinalize(connection)
         end
+
+        return connection
     end
 
+    ---@param connection EventConnection
     function event:_connectionFinalize(connection)
         table.insert(self.connectionsOrder, connection.id)
 
@@ -38,6 +43,20 @@ function modules.classes.event:create()
         connection.connected = true
     end
 
+    ---@param callback function
+    ---@return EventConnection
+    function event:once(callback)
+        local connection
+
+        connection = self:connect(function(...)
+            callback(...)
+            connection:disconnect()
+        end)
+
+        return connection
+    end
+
+    ---@param connection EventConnection
     function event:disconnect(connection)
         if self.isFireing then
             table.insert(self.connectionsToRemove, connection)
@@ -46,6 +65,7 @@ function modules.classes.event:create()
         end
     end
 
+    ---@param connection EventConnection
     function event:_disconnectImidiate(connection)
         self.connections[connection.id] = nil
         table.remove(self.connectionsOrder, connection.index)
@@ -62,6 +82,30 @@ function modules.classes.event:create()
     end
 
     function event:fire(...)
+        self.isFireing = true
+
+        for _, connectionId in ipairs(self.connectionsOrder) do
+            local connection = self.connections[connectionId]
+            local result = connection:fire(...)
+
+            if result == modules.libraries.events.removeConnection then
+                self:disconnect(connection)
+            end
+        end
+
+        self.isFireing = false
+
+        for i = #self.connectionsToRemove, 1, -1 do
+            self:_disconnectImidiate(self.connectionsToRemove[i])
+            self.connectionsToRemove[i] = nil
+        end
+
+        for i = 1, #self.connectionsToAdd do
+            self:_connectionFinalize(self.connectionsToAdd[i])
+            self.connectionsToAdd[i] = nil
+        end
+
+        self.hasFiredOnce = true
     end
 
     return event
