@@ -6,7 +6,7 @@ function modules.classes.connection:create(callback)
     ---@class EventConnection
     local connection = {
         callback = callback,
-        parentEvent = nil,
+        parentEvent = nil, ---@type Event
         connected = false,
         id = nil,
         index = nil
@@ -27,4 +27,6 @@ function modules.classes.connection:create(callback)
 
         self.parentEvent:disconnect(self)
     end
+
+    return connection
 end

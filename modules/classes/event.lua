@@ -39,7 +39,26 @@ function modules.classes.event:create()
     end
 
     function event:disconnect(connection)
+        if self.isFireing then
+            table.insert(self.connectionsToRemove, connection)
+        else
+            self:_disconnectImidiate(connection)
+        end
+    end
 
+    function event:_disconnectImidiate(connection)
+        self.connections[connection.id] = nil
+        table.remove(self.connectionsOrder, connection.index)
+
+        for i = connection.index, #self.connectionsOrder do
+            local _connection = self.connections[self.connectionsOrder[i]]
+            _connection.index = _connection.index - 1
+        end
+        
+        connection.connected = false
+        connection.parentEvent = nil
+        connection.id = nil
+        connection.index = nil
     end
 
     function event:fire(...)
