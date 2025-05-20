@@ -3,9 +3,13 @@ modules.libraries.addons = {} -- table of addon functions
 ---@type table <string, Addon>
 modules.libraries.addons.addons = {} -- table of addons
 
+---@param name string
+---@param version string|number
+---@param author string
+---@param description string
 ---@return Addon
-function modules.libraries.addons:create(...)
-    local addon = modules.classes.addon:create(...)
+function modules.libraries.addons:create(name, version, author, description)
+    local addon = modules.classes.addon:create(name, version, author, description)
     return addon
 end
 

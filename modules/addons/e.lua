@@ -9,14 +9,6 @@ function addonfunc:init()
         end
     end)
 
-    modules.libraries.commands:create("e", {"e"}, "e", function(full_message, peer_id, is_admin, is_auth, command, ...)
-        modules.libraries.logging:info("e()", "Player: " .. peer_id .. " sent a command: " .. command)
-    end)
-
-    modules.libraries.commands:create("a", {"a"}, "ea", function(full_message, peer_id, is_admin, is_auth, command, ...)
-        modules.libraries.logging:info("ea()", "Player: " .. peer_id .. " sent a command: " .. command)
-    end)
-
     return true
 end
 
