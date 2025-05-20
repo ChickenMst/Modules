@@ -22,17 +22,17 @@ function modules.libraries.commands:create(commandstr, alias, description, func)
         for _, a in pairs(alias) do
             -- check if alias is the same as its command
             if self:cleanCommandString(a) == self:cleanCommandString(commandstr) then
-                modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." can't be the same as command: "..commandstr..". aborting command creation")
+                modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." can't be the same as command: "..commandstr.." | aborting command creation")
                 return false
             end
             for _, cmd in pairs(self.commands) do
                 if type(cmd.alias) == "table" then
                     for _, existing_a in pairs(cmd.alias) do
                         if self:cleanCommandString(a) == self:cleanCommandString(existing_a) then -- check if alias is the same as another alias
-                            modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." for command: "..commandstr.." already exists. aborting command creation")
+                            modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." for command: "..commandstr.." already exists | aborting command creation")
                             return false
                         elseif self:cleanCommandString(a) == self:cleanCommandString(cmd.commandstr) then -- check if alias is the same as another command
-                            modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." can't be the same as command: "..cmd.commandstr..". aborting command creation")
+                            modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." can't be the same as command: "..cmd.commandstr.." | aborting command creation")
                             return false
                         end
                     end
