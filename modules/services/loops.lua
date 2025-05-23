@@ -24,7 +24,7 @@ modules.libraries.callbacks:connect("onTick", function ()
     local timeNow = server.getTimeMillisec()
 	for _, v in pairs(modules.services.loops.loops) do
 		if timeNow >= v.creationTime + (v.time * 1000) and not v.paused then
-			v.callback(v.id)
+			v.callback()
 			v.creationTime = timeNow
 		end
 	end
