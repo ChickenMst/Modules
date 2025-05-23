@@ -4,6 +4,7 @@ modules.libraries.callbacks.events = {} -- table of events
 
 ---@param name string
 ---@param callback function
+---@return EventConnection
 function modules.libraries.callbacks:connect(name, callback)
     local event = self:_initCallback(name) -- initialize the callback
 
@@ -11,6 +12,16 @@ function modules.libraries.callbacks:connect(name, callback)
 end
 
 ---@param name string
+---@param callback function
+---@return EventConnection
+function modules.libraries.callbacks:once(name, callback)
+    local event = self:_initCallback(name) -- initialize the callback
+
+    return event:once(callback) -- connect the callback to the event
+end
+
+---@param name string
+---@return Event
 function modules.libraries.callbacks:_initCallback(name)
     local event = modules.libraries.callbacks.events[name]
 
