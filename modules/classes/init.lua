@@ -5,3 +5,4 @@ require "modules.classes.addon" -- load the addon class
 require "modules.classes.loop" -- load the loop class
 require "modules.classes.command" -- load the command class
 require "modules.classes.connection" -- load the connection class
+require "modules.classes.vehicleGroup" -- load the vehicle group class
