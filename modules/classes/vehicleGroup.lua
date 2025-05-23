@@ -1,14 +1,20 @@
-modules.classes.vehicle = {} -- table of vehicle functions
+modules.classes.vehicleGroup = {} -- table of vehicle functions
 
-function modules.classes.vehicle:create(groupid, vehicles, owner, spawnTime)
+---comment
+---@param groupId number
+---@param owner any
+---@param spawnTime number|nil
+---@return VehicleGroup
+function modules.classes.vehicleGroup:create(groupId, owner, spawnTime)
     ---@class VehicleGroup
     local vehicleGroup = {
-        groupid = groupid,
-        vehicles = vehicles,
+        groupId = groupId,
+        vehicles = {}, ---@type Vehicle[]
         owner = owner,
-        spawnTime = spawnTime,
+        spawnTime = spawnTime or server.getTimeMillisec(),
         onDespawn = modules.libraries.events:create(),
         onLoaded = modules.libraries.events:create(),
+        isLoaded = false,
     }
 
     function vehicleGroup:despawned(is_instant)
