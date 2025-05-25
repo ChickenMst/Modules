@@ -15,6 +15,7 @@ modules.libraries.callbacks:connect("onVehicleSpawn", function(vehicle_id, peer_
         vGroup:addVehicle(vehicle)
     end
 
+    modules.libraries.logging:debug("onVehicleSpawn", "Vehicle spawned with id: " .. vehicle_id .. ", group id: " .. group_id)
     modules.services.vehicles.loadingVehicles[group_id] = vGroup
 end)
 
@@ -36,6 +37,7 @@ modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
     end
 
     if loaded then
+        modules.libraries.logging:debug("onVehicleLoad", "Vehicle group loaded with id: " .. vGroup.group_id)
         vGroup:loaded()
         modules.services.vehicles.loadedVehicles[vdata.group_id] = vGroup
         modules.services.vehicles.loadingVehicles[vdata.group_id] = nil
@@ -52,6 +54,7 @@ modules.libraries.callbacks:connect("onVehicleDespawn", function(vehicle_id, pee
     end
 
     if vGroup.vehicles[vehicle_id] then
+        modules.libraries.logging:debug("onVehicleDespawn", "Vehicle despawned with id: " .. vehicle_id .. ", group id: " .. vGroup.group_id)
         vGroup.vehicles[vehicle_id]:despawned()
         vGroup.vehicles[vehicle_id] = nil
     end
@@ -64,6 +67,7 @@ modules.libraries.callbacks:connect("onVehicleDespawn", function(vehicle_id, pee
     end
 
     if despawned then
+        modules.libraries.logging:debug("onVehicleDespawn", "Vehicle group despawned with id: " .. vGroup.group_id)
         vGroup:despawned()
         modules.services.vehicles.loadedVehicles[vdata.group_id] = nil
     end
