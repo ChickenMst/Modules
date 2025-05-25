@@ -7,10 +7,12 @@ function modules.classes.vehicle:create(vehicleId, groupId)
         groupId = groupId,
         onDespawn = modules.libraries.events:create(),
         onLoaded = modules.libraries.events:create(),
-        isLoaded = false
+        isLoaded = false,
+        isDespawned = false
     }
 
     function vehicle:despawned(is_instant)
+        self.isDespawned = true
         self.onDespawn:fire(self)
     end
 

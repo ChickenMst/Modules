@@ -22,6 +22,7 @@ function modules.classes.vehicleGroup:create(groupId, owner, spawnTime)
     end
 
     function vehicleGroup:loaded()
+        self.isLoaded = true
         self.onLoaded:fire(self)
     end
 
