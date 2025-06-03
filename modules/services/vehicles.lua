@@ -3,6 +3,10 @@ modules.services.vehicles = {} -- table of vehicle services
 modules.services.vehicles.loadingVehicles = {} ---@type table <number, VehicleGroup> -- table of vehicles
 modules.services.vehicles.loadedVehicles = {} ---@type table <number, VehicleGroup>
 
+modules.libraries.callbacks:once("onCreate", function()
+    modules.services.vehicles = modules.libraries.gsave:loadService("vehicles") or modules.services.vehicles
+end)
+
 modules.libraries.callbacks:connect("onVehicleSpawn", function(vehicle_id, peer_id, x, y, z, group_cost, group_id)
     local vGroup = modules.services.vehicles.loadingVehicles[group_id]
 
@@ -17,6 +21,7 @@ modules.libraries.callbacks:connect("onVehicleSpawn", function(vehicle_id, peer_
 
     modules.libraries.logging:debug("onVehicleSpawn", "Vehicle spawned with id: " .. vehicle_id .. ", group id: " .. group_id)
     modules.services.vehicles.loadingVehicles[group_id] = vGroup
+    modules.libraries.gsave:saveService("vehicles", modules.services.vehicles)
 end)
 
 modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
@@ -41,6 +46,7 @@ modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
         vGroup:loaded()
         modules.services.vehicles.loadedVehicles[vdata.group_id] = vGroup
         modules.services.vehicles.loadingVehicles[vdata.group_id] = nil
+        modules.libraries.gsave:saveService("vehicles", modules.services.vehicles)
     end
 end)
 
@@ -70,5 +76,6 @@ modules.libraries.callbacks:connect("onVehicleDespawn", function(vehicle_id, pee
         modules.libraries.logging:debug("onVehicleDespawn", "Vehicle group despawned with id: " .. vGroup.group_id)
         vGroup:despawned()
         modules.services.vehicles.loadedVehicles[vdata.group_id] = nil
+        modules.libraries.gsave:saveService("vehicles", modules.services.vehicles)
     end
 end)
