@@ -1,6 +1,5 @@
 modules.classes.vehicleGroup = {} -- table of vehicle functions
 
----comment
 ---@param group_id number|string
 ---@param owner any
 ---@param spawnTime number|nil
