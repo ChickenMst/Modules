@@ -1,13 +1,17 @@
 modules.classes.vehicle = {} -- table of vehicle functions
 
-function modules.classes.vehicle:create(vehicleId, groupId)
+---@param vehicleId number
+---@param groupId number|string
+---@param loaded boolean|nil
+---@return Vehicle
+function modules.classes.vehicle:create(vehicleId, groupId, loaded)
     ---@class Vehicle
     local vehicle = {
         id = vehicleId,
-        groupId = groupId,
+        groupId = tostring(groupId),
         onDespawn = modules.libraries.events:create(),
         onLoaded = modules.libraries.events:create(),
-        isLoaded = false,
+        isLoaded = loaded or false,
         isDespawned = false
     }
 

@@ -8,6 +8,7 @@ modules.libraries.callbacks:once("onCreate", function()
 end)
 
 modules.libraries.callbacks:connect("onVehicleSpawn", function(vehicle_id, peer_id, x, y, z, group_cost, group_id)
+    local group_id = tostring(group_id)
     local vGroup = modules.services.vehicles.loadingVehicles[group_id]
 
     if not vGroup then
@@ -27,7 +28,7 @@ end)
 modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
     local vdata = server.getVehicleData(vehicle_id)
 
-    local vGroup = modules.services.vehicles.loadingVehicles[vdata.group_id]
+    local vGroup = modules.services.vehicles.loadingVehicles[tostring(vdata.group_id)]
     if not vGroup then
         modules.libraries.logging:error("onVehicleLoad", "Vehicle group not found for vehicle id: " .. vehicle_id)
         return
@@ -44,8 +45,8 @@ modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
     if loaded then
         modules.libraries.logging:debug("onVehicleLoad", "Vehicle group loaded with id: " .. vGroup.group_id)
         vGroup:loaded()
-        modules.services.vehicles.loadedVehicles[vdata.group_id] = vGroup
-        modules.services.vehicles.loadingVehicles[vdata.group_id] = nil
+        modules.services.vehicles.loadedVehicles[tostring(vdata.group_id)] = vGroup
+        modules.services.vehicles.loadingVehicles[tostring(vdata.group_id)] = nil
         modules.services.vehicles:_save()
     end
 end)
@@ -53,7 +54,7 @@ end)
 modules.libraries.callbacks:connect("onVehicleDespawn", function(vehicle_id, peer_id)
     local vdata = server.getVehicleData(vehicle_id)
 
-    local vGroup = modules.services.vehicles.loadedVehicles[vdata.group_id]
+    local vGroup = modules.services.vehicles.loadedVehicles[tostring(vdata.group_id)]
     if not vGroup then
         modules.libraries.logging:error("onVehicleDespawn()", "Vehicle group not found for vehicle id: " .. vehicle_id)
         return
@@ -75,7 +76,7 @@ modules.libraries.callbacks:connect("onVehicleDespawn", function(vehicle_id, pee
     if despawned then
         modules.libraries.logging:debug("onVehicleDespawn", "Vehicle group despawned with id: " .. vGroup.group_id)
         vGroup:despawned()
-        modules.services.vehicles.loadedVehicles[vdata.group_id] = nil
+        modules.services.vehicles.loadedVehicles[tostring(vdata.group_id)] = nil
         modules.services.vehicles:_save()
     end
 end)
@@ -93,10 +94,28 @@ function modules.services.vehicles:_load()
     end
 
     if service.loadingVehicles then
-        self.loadingVehicles = service.loadingVehicles
+        local rebuilt = {} -- table to rebuild loading vehicles
+        for _,vGroup in pairs(service.loadingVehicles) do
+            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.group_id, vGroup.owner, vGroup.spawnTime)
+            for _, vehicle in pairs(vGroup.vehicles) do
+                local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.group_id, vehicle.isLoaded)
+                rebuiltGroup:addVehicle(rebuiltVehicle)
+            end
+            rebuilt[vGroup.group_id] = rebuiltGroup
+        end
+        self.loadingVehicles = rebuilt
     end
 
     if service.loadedVehicles then
-        self.loadedVehicles = service.loadedVehicles
+        local rebuilt = {} -- table to rebuild loading vehicles
+        for _,vGroup in pairs(service.loadedVehicles) do
+            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.group_id, vGroup.owner, vGroup.spawnTime, vGroup.isLoaded)
+            for _, vehicle in pairs(vGroup.vehicles) do
+                local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.group_id, vehicle.isLoaded)
+                rebuiltGroup:addVehicle(rebuiltVehicle)
+            end
+            rebuilt[vGroup.group_id] = rebuiltGroup
+        end
+        self.loadedVehicles = rebuilt
     end
 end
