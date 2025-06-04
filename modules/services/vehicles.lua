@@ -30,7 +30,7 @@ modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
 
     local vGroup = modules.services.vehicles.loadingVehicles[tostring(vdata.group_id)]
     if not vGroup then
-        modules.libraries.logging:wanring("onVehicleLoad", "Vehicle group not found for vehicle id: " .. vehicle_id)
+        modules.libraries.logging:warning("onVehicleLoad", "Vehicle group not found for vehicle id: " .. vehicle_id)
         return
     end
     vGroup.vehicles[vehicle_id]:loaded()
