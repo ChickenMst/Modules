@@ -20,6 +20,7 @@ modules.libraries.callbacks:once("onCreate", function()
     modules:_setIsDedicated() -- set the isDedicated variable
 
     if not g_savedata then
+        modules.libraries.logging:warn("modules.onCreate", "g_savedata is not initialized, creating a new one.")
         -- setup gsave
         g_savedata = {
             modules = {

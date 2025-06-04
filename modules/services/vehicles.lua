@@ -4,7 +4,7 @@ modules.services.vehicles.loadingVehicles = {} ---@type table <number, VehicleGr
 modules.services.vehicles.loadedVehicles = {} ---@type table <number, VehicleGroup>
 
 modules.libraries.callbacks:once("onCreate", function()
-    modules.services.vehicles = modules.libraries.gsave:loadService("vehicles") or modules.services.vehicles
+    modules.services.vehicles:_load() -- save the service on creation
 end)
 
 modules.libraries.callbacks:connect("onVehicleSpawn", function(vehicle_id, peer_id, x, y, z, group_cost, group_id)
@@ -21,7 +21,7 @@ modules.libraries.callbacks:connect("onVehicleSpawn", function(vehicle_id, peer_
 
     modules.libraries.logging:debug("onVehicleSpawn", "Vehicle spawned with id: " .. vehicle_id .. ", group id: " .. group_id)
     modules.services.vehicles.loadingVehicles[group_id] = vGroup
-    modules.libraries.gsave:saveService("vehicles", modules.services.vehicles)
+    modules.services.vehicles:_save()
 end)
 
 modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
@@ -46,7 +46,7 @@ modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
         vGroup:loaded()
         modules.services.vehicles.loadedVehicles[vdata.group_id] = vGroup
         modules.services.vehicles.loadingVehicles[vdata.group_id] = nil
-        modules.libraries.gsave:saveService("vehicles", modules.services.vehicles)
+        modules.services.vehicles:_save()
     end
 end)
 
@@ -76,6 +76,27 @@ modules.libraries.callbacks:connect("onVehicleDespawn", function(vehicle_id, pee
         modules.libraries.logging:debug("onVehicleDespawn", "Vehicle group despawned with id: " .. vGroup.group_id)
         vGroup:despawned()
         modules.services.vehicles.loadedVehicles[vdata.group_id] = nil
-        modules.libraries.gsave:saveService("vehicles", modules.services.vehicles)
+        modules.services.vehicles:_save()
     end
 end)
+
+function modules.services.vehicles:_save()
+    modules.libraries.gsave:saveService("vehicles", self)
+end
+
+function modules.services.vehicles:_load()
+    local service = modules.libraries.gsave:loadService("vehicles")
+
+    if not service then
+        modules.libraries.logging:warn("vehicles:_load", "Skiped loading vehicles service, no data found.")
+        return
+    end
+
+    if service.loadingVehicles then
+        self.loadingVehicles = service.loadingVehicles
+    end
+
+    if service.loadedVehicles then
+        self.loadedVehicles = service.loadedVehicles
+    end
+end
