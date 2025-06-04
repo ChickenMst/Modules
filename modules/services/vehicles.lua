@@ -89,7 +89,7 @@ function modules.services.vehicles:_load()
     local service = modules.libraries.gsave:loadService("vehicles")
 
     if not service then
-        modules.libraries.logging:warn("vehicles:_load", "Skiped loading vehicles service, no data found.")
+        modules.libraries.logging:warning("vehicles:_load", "Skiped loading vehicles service, no data found.")
         return
     end
 
