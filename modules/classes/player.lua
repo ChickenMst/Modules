@@ -59,4 +59,6 @@ function modules.classes.player:create(peerId, steamId, name, admin, auth, perms
             self.perms[perm] = nil
         end
     end
+
+    return player
 end
