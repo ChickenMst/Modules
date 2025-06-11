@@ -8,12 +8,28 @@ require "modules.addons" -- load the addons
 
 modules.isDedicated = false -- is the server dedicated?
 
+modules.addonReason = "create"
+
 -- internal function to set the isDedicated variable
 function modules:_setIsDedicated()
     local host = server.getPlayers()[1]
     self.isDedicated = host and (host.steam_id == 0 and host.object_id == nil)
     modules.libraries.logging:info("modules.isDedicated", tostring(modules.isDedicated))
 end
+
+modules.libraries.callbacks:connect("onCreate", function(is_world_create)
+    if is_world_create then
+        modules.addonReason = "create"
+    else
+        modules.addonReason = "reload"
+    end
+
+    -- load the player service on creationTime
+    modules.services.player:_load()
+
+    -- load the vehicles service on creationTime
+    modules.services.vehicles:_load()
+end)
 
 -- connect into onCreate for setup of modules
 modules.libraries.callbacks:once("onCreate", function()

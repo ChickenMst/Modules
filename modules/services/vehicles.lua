@@ -4,7 +4,7 @@ modules.services.vehicles.loadingVehicles = {} ---@type table <number, VehicleGr
 modules.services.vehicles.loadedVehicles = {} ---@type table <number, VehicleGroup>
 
 modules.libraries.callbacks:once("onCreate", function(is_world_create)
-    if not is_world_create then
+    if modules.addonReason == "reload" then
         modules.services.vehicles:_load() -- load the service on creation
     end
 end)
