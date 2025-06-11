@@ -16,18 +16,15 @@ function modules:_setIsDedicated()
     self.isDedicated = host and (host.steam_id == 0 and host.object_id == nil)
     modules.libraries.logging:info("modules.isDedicated", tostring(modules.isDedicated))
 end
+-- connect into onCreate for setup of modules
+modules.libraries.callbacks:once("onCreate", function(is_world_create)
+    modules:_setIsDedicated() -- set the isDedicated variable
 
-modules.libraries.callbacks:connect("onCreate", function(is_world_create)
     if is_world_create then
         modules.addonReason = "create"
     else
         modules.addonReason = "reload"
     end
-end)
-
--- connect into onCreate for setup of modules
-modules.libraries.callbacks:once("onCreate", function()
-    modules:_setIsDedicated() -- set the isDedicated variable
 
     if not g_savedata then
         modules.libraries.logging:warn("modules.onCreate", "g_savedata is not initialized, creating a new one.")
