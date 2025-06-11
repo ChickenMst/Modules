@@ -4,26 +4,6 @@ modules.services.player.players = {} ---@type table<string, Player>
 
 modules.libraries.callbacks:once("onCreate", function (is_world_create)
     modules.services.player:_load() -- load the player service on creation
-    for _, player in pairs(server.getPlayers()) do
-        local existingPlayer = modules.services.player:getPlayer(player.steam_id)
-        if not existingPlayer then
-            local newPlayer = modules.classes.player:create(
-                player.id,
-                player.steam_id,
-                player.name,
-                player.admin,
-                player.auth
-            )
-            modules.libraries.logging:debug("services.player", "Creating new player class for steam_id: " .. player.steam_id)
-            if newPlayer then
-                modules.services.player.players[tostring(player.steam_id)] = newPlayer -- add the player to the table
-                modules.libraries.logging:debug("services.player", "Loaded existing player: " .. newPlayer.name .. " with steam_id: " .. newPlayer.steamId)
-                modules.services.player:_save() -- save the player service
-            else
-                modules.libraries.logging:warning("services.player", "Failed to create player class for steam_id: " .. player.steam_id)
-            end
-        end
-    end
 end)
 
 modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth)
@@ -75,8 +55,8 @@ function modules.services.player:_load()
         return
     end
 
-    if service.players then
-        for _, playerData in ipairs(service.players) do
+    if service.players ~= nil then
+        for _, playerData in pairs(service.players) do
             if not playerData or not playerData.steamId then
                 modules.libraries.logging:warning("services.player:_load", "Skiped loading player data, no data")
                 return
@@ -95,6 +75,26 @@ function modules.services.player:_load()
             else
                 self.players[tostring(playerData.steamId)] = player -- add the player to the table
                 modules.libraries.logging:debug("services.player:_load", "Loaded player: " .. player.name .. " with steam_id: " .. player.steamId)
+            end
+        end
+    end
+
+    for _, player in pairs(server.getPlayers()) do
+        local existingPlayer = self:getPlayer(player.steam_id)
+        if not existingPlayer then
+            local newPlayer = modules.classes.player:create(
+                player.id,
+                player.steam_id,
+                player.name,
+                player.admin,
+                player.auth
+            )
+            if newPlayer then
+                self.players[tostring(player.steam_id)] = newPlayer -- add the player to the table
+                modules.libraries.logging:debug("services.player:_load", "Created player class for player: " .. newPlayer.name .. " with steam_id: " .. newPlayer.steamId)
+                self:_save() -- save the player service
+            else
+                modules.libraries.logging:warning("services.player:_load", "Failed to create player class for steam_id: " .. player.steam_id)
             end
         end
     end
