@@ -1,7 +1,7 @@
 modules.classes.vehicleGroup = {} -- table of vehicle functions
 
 ---@param group_id number|string
----@param owner any
+---@param owner Player|nil
 ---@param spawnTime number|nil
 ---@param loaded boolean|nil
 ---@return VehicleGroup

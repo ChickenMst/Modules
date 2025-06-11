@@ -6,7 +6,7 @@ modules.libraries.commands.commands = {} -- table of commands
 ---@param commandstr string
 ---@param alias table
 ---@param description string
----@param func function
+---@param func fun(full_message, peer_id, is_admin, is_auth, command, ...)
 ---@return boolean
 function modules.libraries.commands:create(commandstr, alias, description, func)
     commandstr = self:cleanCommandString(commandstr) -- clean command string

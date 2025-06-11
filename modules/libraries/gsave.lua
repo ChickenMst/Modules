@@ -10,7 +10,8 @@ function modules.libraries.gsave:loadService(name)
     self:_checkGsave(name)
 
     if not g_savedata.modules.services[name] then
-        modules.libraries.logging:warning("gsave:loadService", "Service '" .. name .. "' not found in g_savedata, returning empty table.")
+        modules.libraries.logging:debug("gsave:loadService", "Service '" .. name .. "' not found in g_savedata, returning empty table.")
+        self:_fixGsave(name)
         return {}
     end
 
@@ -47,4 +48,10 @@ function modules.libraries.gsave:_fixGsave(name)
     if name and not g_savedata.modules.services[name] then
         g_savedata.modules.services[name] = {}
     end
+end
+
+function modules.libraries.gsave:_purgeGsave()
+    g_savedata = nil
+    self:_fixGsave()
+    modules.libraries.logging:info("gsave:_purgeGsave", "GSave data purged and reset.")
 end

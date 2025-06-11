@@ -8,11 +8,11 @@ modules.libraries.callbacks:once("onCreate", function()
 end)
 
 modules.libraries.callbacks:connect("onVehicleSpawn", function(vehicle_id, peer_id, x, y, z, group_cost, group_id)
-    local group_id = tostring(group_id)
+    group_id = tostring(group_id)
     local vGroup = modules.services.vehicles.loadingVehicles[group_id]
 
     if not vGroup then
-        vGroup = modules.classes.vehicleGroup:create(group_id, peer_id)
+        vGroup = modules.classes.vehicleGroup:create(group_id, modules.services.player:getPlayerByPeer(peer_id))
     end
 
     if not vGroup.vehicles[vehicle_id] then
@@ -96,7 +96,7 @@ function modules.services.vehicles:_load()
     if service.loadingVehicles then
         local rebuilt = {} -- table to rebuild loading vehicles
         for _,vGroup in pairs(service.loadingVehicles) do
-            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.group_id, vGroup.owner, vGroup.spawnTime)
+            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.group_id, modules.services.player:getPlayer(vGroup.owner.steamId), vGroup.spawnTime)
             for _, vehicle in pairs(vGroup.vehicles) do
                 local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.group_id, vehicle.isLoaded)
                 rebuiltGroup:addVehicle(rebuiltVehicle)
@@ -109,7 +109,7 @@ function modules.services.vehicles:_load()
     if service.loadedVehicles then
         local rebuilt = {} -- table to rebuild loading vehicles
         for _,vGroup in pairs(service.loadedVehicles) do
-            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.group_id, vGroup.owner, vGroup.spawnTime, vGroup.isLoaded)
+            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.group_id, modules.services.player:getPlayer(vGroup.owner.steamId), vGroup.spawnTime, vGroup.isLoaded)
             for _, vehicle in pairs(vGroup.vehicles) do
                 local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.group_id, vehicle.isLoaded)
                 rebuiltGroup:addVehicle(rebuiltVehicle)
