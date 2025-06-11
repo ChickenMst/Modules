@@ -7,3 +7,7 @@ modules.libraries.callbacks:connect("onCreate", function(is_world_create)
 		modules.libraries.logging:info("onCreate()", "Script reloaded")
 	end
 end)
+
+modules.libraries.commands:create("test",{},"",function()
+	
+end)

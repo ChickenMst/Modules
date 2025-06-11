@@ -7,3 +7,4 @@ require "modules.classes.command" -- load the command class
 require "modules.classes.connection" -- load the connection class
 require "modules.classes.vehicle" -- load the callback classes
 require "modules.classes.vehicleGroup" -- load the vehicle group class
+require "modules.classes.player" -- load the player class

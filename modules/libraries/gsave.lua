@@ -10,7 +10,7 @@ function modules.libraries.gsave:loadService(name)
     self:_checkGsave(name)
 
     if not g_savedata.modules.services[name] then
-        modules.libraries.logging:warn("gsave:loadService", "Service '" .. name .. "' not found in g_savedata, returning empty table.")
+        modules.libraries.logging:warning("gsave:loadService", "Service '" .. name .. "' not found in g_savedata, returning empty table.")
         return {}
     end
 
