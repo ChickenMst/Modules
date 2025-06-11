@@ -59,7 +59,11 @@ function modules.services.player:_load()
         for _, playerData in pairs(service.players) do
             if not playerData or not playerData.steamId then
                 modules.libraries.logging:warning("services.player:_load", "Skiped loading player data, no data")
-                return
+                goto continue -- skip if playerData is nil or steamId is missing
+            end
+            if playerData.steamId == "0" then
+                modules.libraries.logging:debug("services.player:_load", "Skiped loading player: "..playerData.name)
+                goto continue -- skip players with steam_id 0
             end
             local player = modules.classes.player:create(
                 playerData.peerId,
@@ -76,10 +80,15 @@ function modules.services.player:_load()
                 self.players[tostring(playerData.steamId)] = player -- add the player to the table
                 modules.libraries.logging:debug("services.player:_load", "Loaded player: " .. player.name .. " with steam_id: " .. player.steamId)
             end
+            ::continue::
         end
     end
 
     for _, player in pairs(server.getPlayers()) do
+        if player.steam_id == 0 then
+            modules.libraries.logging:debug("services.player:_load", "Skiped loading player: "..player.name)
+            goto continue -- skip players with steam_id 0
+        end
         local existingPlayer = self:getPlayer(player.steam_id)
         if not existingPlayer then
             local newPlayer = modules.classes.player:create(
@@ -97,7 +106,9 @@ function modules.services.player:_load()
                 modules.libraries.logging:warning("services.player:_load", "Failed to create player class for steam_id: " .. player.steam_id)
             end
         end
+        ::continue::
     end
+    self:_save() -- save the player service after loading
 end
 
 function modules.services.player:_save()
