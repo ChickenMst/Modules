@@ -101,14 +101,14 @@ function modules.services.player:_load()
             if newPlayer then
                 self.players[tostring(player.steam_id)] = newPlayer -- add the player to the table
                 modules.libraries.logging:debug("services.player:_load", "Created player class for player: " .. newPlayer.name .. " with steam_id: " .. newPlayer.steamId)
-                self:_save() -- save the player service
+                modules.services.player:_save() -- save the player service
             else
                 modules.libraries.logging:warning("services.player:_load", "Failed to create player class for steam_id: " .. player.steam_id)
             end
         end
         ::continue::
     end
-    self:_save() -- save the player service after loading
+    modules.services.player:_save() -- save the player service after loading
 end
 
 function modules.services.player:_save()
