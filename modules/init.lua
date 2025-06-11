@@ -23,12 +23,6 @@ modules.libraries.callbacks:connect("onCreate", function(is_world_create)
     else
         modules.addonReason = "reload"
     end
-
-    -- load the player service on creationTime
-    modules.services.player:_load()
-
-    -- load the vehicles service on creationTime
-    modules.services.vehicles:_load()
 end)
 
 -- connect into onCreate for setup of modules
