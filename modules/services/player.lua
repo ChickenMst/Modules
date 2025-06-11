@@ -3,7 +3,9 @@ modules.services.player = {}
 modules.services.player.players = {} ---@type table<string, Player>
 
 modules.libraries.callbacks:once("onCreate", function (is_world_create)
-    modules.services.player:_load() -- load the player service on creation
+    if not is_world_create then
+        modules.services.player:_load() -- load the player service on creationTime
+    end
 end)
 
 modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth)

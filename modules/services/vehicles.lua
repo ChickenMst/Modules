@@ -3,8 +3,10 @@ modules.services.vehicles = {} -- table of vehicle services
 modules.services.vehicles.loadingVehicles = {} ---@type table <number, VehicleGroup> -- table of vehicles
 modules.services.vehicles.loadedVehicles = {} ---@type table <number, VehicleGroup>
 
-modules.libraries.callbacks:once("onCreate", function()
-    modules.services.vehicles:_load() -- save the service on creation
+modules.libraries.callbacks:once("onCreate", function(is_world_create)
+    if not is_world_create then
+        modules.services.vehicles:_load() -- load the service on creation
+    end
 end)
 
 modules.libraries.callbacks:connect("onVehicleSpawn", function(vehicle_id, peer_id, x, y, z, group_cost, group_id)
