@@ -3,6 +3,11 @@ modules.libraries.gsave = {}
 function modules.libraries.gsave:saveService(name, service)
     self:_checkGsave(name)
 
+    for key, value in pairs(service) do
+        if type(value) == "function" then
+            service[key] = nil -- Remove functions from the service to avoid serialization issues
+        end
+    end
     g_savedata.modules.services[name] = service
 end
 
