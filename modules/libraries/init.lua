@@ -8,4 +8,3 @@ require "modules.libraries.callbacks" -- load the callbacks library
 require "modules.libraries.addons" -- load the addons library
 require "modules.libraries.commands" -- load the commands library
 require "modules.libraries.gsave" -- load the gsave library
-require "modules.libraries.player" -- load the player library
