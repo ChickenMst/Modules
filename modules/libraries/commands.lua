@@ -7,14 +7,14 @@ modules.libraries.commands.commands = {} -- table of commands
 ---@param alias table
 ---@param description string
 ---@param func fun(full_message, peer_id, is_admin, is_auth, command, ...)
----@return boolean
+---@return Command|nil
 function modules.libraries.commands:create(commandstr, alias, description, func)
     commandstr = self:cleanCommandString(commandstr) -- clean command string
     -- check if command already exists
     local existing_command = self.commands[commandstr]
     if existing_command then
         modules.libraries.logging:warning("libraries.commands", "Command already exists: " .. commandstr)
-        return false
+        return nil
     end
 
     -- check if alias already exists
@@ -23,17 +23,17 @@ function modules.libraries.commands:create(commandstr, alias, description, func)
             -- check if alias is the same as its command
             if self:cleanCommandString(a) == self:cleanCommandString(commandstr) then
                 modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." can't be the same as command: "..commandstr.." | aborting command creation")
-                return false
+                return nil
             end
             for _, cmd in pairs(self.commands) do
                 if type(cmd.alias) == "table" then
                     for _, existing_a in pairs(cmd.alias) do
                         if self:cleanCommandString(a) == self:cleanCommandString(existing_a) then -- check if alias is the same as another alias
                             modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." for command: "..commandstr.." already exists | aborting command creation")
-                            return false
+                            return nil
                         elseif self:cleanCommandString(a) == self:cleanCommandString(cmd.commandstr) then -- check if alias is the same as another command
                             modules.libraries.logging:warning("libraries.commands", "Alias: "..a.." can't be the same as command: "..cmd.commandstr.." | aborting command creation")
-                            return false
+                            return nil
                         end
                     end
                 end
@@ -41,7 +41,7 @@ function modules.libraries.commands:create(commandstr, alias, description, func)
         end
     else
         modules.libraries.logging:warning("libraries.commands", "Alias is not a table, aborting command creation")
-        return false
+        return nil
     end
 
     -- if didnt return false, create command
@@ -50,7 +50,7 @@ function modules.libraries.commands:create(commandstr, alias, description, func)
 
     self.commands[commandstr] = command -- add command to table
 
-    return true
+    return command
 end
 
 -- enables command so it can get run, by default when created it is enabled

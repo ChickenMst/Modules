@@ -9,8 +9,12 @@ modules.libraries.callbacks:connect("onCreate", function(is_world_create)
 end)
 
 modules.libraries.commands:create("test",{},"",function(full_message, peer_id, is_admin, is_auth, command, ...)
-	local player = modules.services.player:getPlayerByPeer(peer_id)
-	modules.libraries.logging:info("test", "Command executed by player: " .. (player and player.name or "Unknown") .. " with peer_id: " .. (player and player.peerId or "Unknown"))
+	local args = table.pack(...)
+	if args[1] then
+		modules.services.addons:enable("e")
+	else
+		modules.services.addons:disable("e")
+	end
 end)
 
 modules.libraries.commands:create("purge",{},"purge gsave data",function(full_message, peer_id, is_admin, is_auth, command, ...)

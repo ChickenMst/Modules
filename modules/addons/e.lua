@@ -1,21 +1,17 @@
-local addon = modules.libraries.addons:create("e",1,"aussieworks","Addon e")
+local addon = modules.classes.addon:create("e",1,"aussieworks","Addon e")
 
-local addonfunc = {}
-
-function addonfunc:init()
-    modules.libraries.callbacks:connect("onChatMessage", function(peer_id, sender_name, message)
+function addon:init()
+    self:addConnection(modules.libraries.callbacks:connect("onChatMessage", function(peer_id, sender_name, message)
         if message == "e" then
             modules.libraries.logging:info("e()", "Player: " .. sender_name .. " sent a message: " .. message)
         end
-    end)
+    end))
 
-    modules.libraries.commands:create("e", {"ee"}, "e", function(full_message, peer_id, is_admin, is_auth, command, ...)
+    self:addCommand(modules.libraries.commands:create("e", {"ee"}, "e", function(full_message, peer_id, is_admin, is_auth, command, ...)
         modules.libraries.logging:info("e()", "Player: " .. peer_id .. " sent a command: " .. command)
-    end)
+    end))
 
-    return true
+    return false
 end
 
-addon:connect(addonfunc)
-
-modules.libraries.addons:connect("e", addon) -- connect the addon to the addons table
+modules.services.addons:connect("e", addon) -- connect the addon to the addons table
