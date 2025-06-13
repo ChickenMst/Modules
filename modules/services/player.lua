@@ -28,6 +28,7 @@ function modules.services.player:getPlayer(steam_id)
     for _,player in pairs(self:getPlayers()) do
         modules.libraries.logging:debug("services.player:getPlayer", "Checking player with steam_id: " .. player.steamId)
         if player.steamId == tostring(steam_id) then
+            modules.libraries.logging:debug("services.player:getPlayer", "Found player: " .. player.name .. " from steam_id: " .. player.steamId)
             return player -- return the player object if found
         end
     end
@@ -38,6 +39,7 @@ function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to 
     for _, player in pairs(self:getPlayers()) do
         modules.libraries.logging:debug("services.player:getPlayerByPeer", "Checking player with peer_id: " .. player.peerId)
         if player.peerId == tostring(peer_id) then
+            modules.libraries.logging:debug("services.player:getPlayerByPeer", "Found player: " .. player.name .. " from peer_id: " .. player.peerId)
             return player -- return the player object if found
         end
     end
