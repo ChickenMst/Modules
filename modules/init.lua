@@ -8,8 +8,6 @@ require "modules.addons" -- load the addons
 
 modules.isDedicated = false -- is the server dedicated?
 
-modules.addonReason = "create"
-
 -- internal function to set the isDedicated variable
 function modules:_setIsDedicated()
     local host = server.getPlayers()[1]
@@ -19,12 +17,6 @@ end
 -- connect into onCreate for setup of modules
 modules.libraries.callbacks:once("onCreate", function(is_world_create)
     modules:_setIsDedicated() -- set the isDedicated variable
-
-    if is_world_create then
-        modules.addonReason = "create"
-    else
-        modules.addonReason = "reload"
-    end
 
     if not g_savedata then
         modules.libraries.logging:warn("modules.onCreate", "g_savedata is not initialized, creating a new one.")

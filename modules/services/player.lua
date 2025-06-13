@@ -3,7 +3,7 @@ modules.services.player = {}
 modules.services.player.players = {} ---@type table<string, Player>
 
 modules.libraries.callbacks:once("onCreate", function (is_world_create)
-    if modules.addonReason == "reload" then
+    if not is_world_create then
         modules.services.player:_load() -- load the player service on creationTime
     end
 end)
@@ -25,21 +25,18 @@ modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, pee
 end)
 
 function modules.services.player:getPlayer(steam_id)
-    if not steam_id then
-        return nil
+    for _,player in pairs(self:getPlayers()) do
+        modules.libraries.logging:debug("services.player:getPlayer", "Checking player with steam_id: " .. player.steamId)
+        if player.steamId == tostring(steam_id) then
+            return player -- return the player object if found
+        end
     end
-
-    local player = self:getPlayers()[tostring(steam_id)]
-    if not player then
-        modules.libraries.logging:info("services.player:getPlayer", "Player not found with steam_id: " .. steam_id)
-        return nil
-    end
-
-    return player -- return the player object
+    modules.libraries.logging:info("services.player:getPlayer", "Player not found with steam_id: " .. steam_id)
 end
 
 function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to use this function, but it is here for compatibility
     for _, player in pairs(self:getPlayers()) do
+        modules.libraries.logging:debug("services.player:getPlayerByPeer", "Checking player with peer_id: " .. player.peerId)
         if player.peerId == tostring(peer_id) then
             return player -- return the player object if found
         end
