@@ -10,7 +10,7 @@ modules.libraries.callbacks:connect("onCreate", function()
             if addonloaded then
                 modules.libraries.logging:debug("services.addons", "Addon "..name.." loaded")
             else
-                modules.libraries.logging:error("services.addons", "Addon "..name.." failed to load, disableing addon")
+                modules.libraries.logging:warning("services.addons", "Addon "..name.." failed to load, disableing addon")
                 modules.services.addons:disable(name) -- disable the addon if it fails to load
             end
         else
