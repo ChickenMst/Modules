@@ -20,6 +20,20 @@ modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, pee
         end
     end
 
+    player.inGame = true -- set the player as in-game
+    modules.services.player.players[tostring(steam_id)] = player -- add the player to the table
+    modules.services.player:_save() -- save the player service
+end)
+
+modules.libraries.callbacks:connect("onPlayerLeave", function(steam_id, name, peer_id, is_admin, is_auth)
+    -- skip if steam_id is nil or 0
+    if not steam_id or steam_id == 0 then
+        return
+    end
+    modules.libraries.logging:debug("onPlayerLeave", "Player left with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
+    local player = modules.services.player:getPlayer(steam_id)
+    
+    player.inGame = false -- set the player as not in-game
     modules.services.player.players[tostring(steam_id)] = player -- add the player to the table
     modules.services.player:_save() -- save the player service
 end)

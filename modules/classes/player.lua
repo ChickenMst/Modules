@@ -16,6 +16,7 @@ function modules.classes.player:create(peerId, steamId, name, admin, auth, perms
         name = name or "Unknown",
         admin = admin or false,
         auth = auth or false,
+        inGame = true,
         perms = perms or {},
         extra = extra or {}
     }
