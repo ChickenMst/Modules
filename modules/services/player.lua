@@ -2,8 +2,8 @@ modules.services.player = {}
 
 modules.services.player.players = {} ---@type table<string, Player>
 
-modules.libraries.callbacks:once("onCreate", function (is_world_create)
-    if not is_world_create then
+modules.onStart:once(function()
+    if modules.addonReason == "reload" then
         modules.services.player:_load() -- load the player service on creationTime
     end
 end)
