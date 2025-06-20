@@ -75,5 +75,35 @@ function modules.classes.player:create(peerId, steamId, name, admin, auth, perms
         end
     end
 
+    function player:kick()
+        server.kickPlayer(self.peerId)
+    end
+
+    function player:ban()
+        server.banPlayer(self.peerId)
+    end
+
+    function player:kill()
+        local character = server.getPlayerCharacterID(self.peerId)
+        server.killCharacter(character)
+    end
+
+    function player:revive()
+        local character = server.getPlayerCharacterID(self.peerId)
+        server.reviveCharacter(character)
+    end
+
+    function player:teleport(pos)
+        server.setPlayerPosition(self.peerId, pos)
+    end
+
+    function player:getPos()
+        local pos, worked = server.getPlayerPos(self.peerId)
+        if not worked then
+            return matrix.translation(0,0,0)
+        end
+        return pos
+    end
+
     return player
 end
