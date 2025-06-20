@@ -1,5 +1,8 @@
 modules.services.player = {}
 
+modules.services.player.onJoin = modules.libraries.events:create()
+modules.services.player.onLeave = modules.libraries.events:create()
+
 modules.services.player.players = {} ---@type table<string, Player>
 
 modules.onStart:once(function()
@@ -23,6 +26,7 @@ modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, pee
     player.inGame = true -- set the player as in-game
     modules.services.player.players[tostring(steam_id)] = player -- add the player to the table
     modules.services.player:_save() -- save the player service
+    modules.services.player.onJoin:fire(player) -- fire the event
 end)
 
 modules.libraries.callbacks:connect("onPlayerLeave", function(steam_id, name, peer_id, is_admin, is_auth)
@@ -36,6 +40,7 @@ modules.libraries.callbacks:connect("onPlayerLeave", function(steam_id, name, pe
     player.inGame = false -- set the player as not in-game
     modules.services.player.players[tostring(steam_id)] = player -- add the player to the table
     modules.services.player:_save() -- save the player service
+    modules.services.player.onLeave:fire(player) -- fire the event
 end)
 
 function modules.services.player:getPlayer(steam_id)

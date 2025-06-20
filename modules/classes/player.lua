@@ -48,7 +48,7 @@ function modules.classes.player:create(peerId, steamId, name, admin, auth, perms
     end
 
     function player:setPerm(perm, value)
-        self.perms[perm] = value or true
+        self.perms[perm] = value
     end
 
     function player:hasPerm(perm)
