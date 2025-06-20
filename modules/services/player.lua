@@ -42,7 +42,7 @@ modules.onStart:once(function()
         if player then
             player.inGame = false -- set the player as not in-game
             modules.services.player.onLeave:fire(player) -- fire the event
-            modules.services.player.players[tostring(steam_id)] = nil -- remove player after they leave
+            modules.services.player.players[tostring(steam_id)] = player -- remove player after they leave
             modules.services.player:_save() -- save the player service
         end
     end)
