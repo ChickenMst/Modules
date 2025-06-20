@@ -2,7 +2,7 @@ modules.services.addons = {}
 
 modules.services.addons.addons = {} ---@type table <string, Addon>
 
-modules.libraries.callbacks:connect("onCreate", function()
+modules.onStart:connect(function()
     for name, addon in pairs(modules.services.addons.addons) do
         if addon.enabled then
             modules.libraries.logging:debug("services.addons", "Loading addon: "..name)
