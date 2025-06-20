@@ -9,38 +9,38 @@ modules.onStart:once(function()
     if modules.addonReason == "reload" then
         modules.services.player:_load() -- load the player service on creationTime
     end
-end)
 
-modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth)
-    modules.libraries.logging:debug("onPlayerJoin", "Player joined with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
-    local player = modules.services.player:getPlayer(steam_id)
+    modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth)
+        modules.libraries.logging:debug("onPlayerJoin", "Player joined with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
+        local player = modules.services.player:getPlayer(steam_id)
 
-    if not player then
-        player = modules.classes.player:create(peer_id, steam_id, name, is_admin, is_auth)
         if not player then
-            modules.libraries.logging:warning("services.player", "Failed to create player class: " .. steam_id)
+            player = modules.classes.player:create(peer_id, steam_id, name, is_admin, is_auth)
+            if not player then
+                modules.libraries.logging:warning("services.player", "Failed to create player class: " .. steam_id)
+                return
+            end
+        end
+
+        player.inGame = true -- set the player as in-game
+        modules.services.player.players[tostring(steam_id)] = player -- add the player to the table
+        modules.services.player:_save() -- save the player service
+        modules.services.player.onJoin:fire(player) -- fire the event
+    end)
+
+    modules.libraries.callbacks:connect("onPlayerLeave", function(steam_id, name, peer_id, is_admin, is_auth)
+        -- skip if steam_id is nil or 0
+        if not steam_id or steam_id == 0 then
             return
         end
-    end
+        modules.libraries.logging:debug("onPlayerLeave", "Player left with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
+        local player = modules.services.player:getPlayer(steam_id)
 
-    player.inGame = true -- set the player as in-game
-    modules.services.player.players[tostring(steam_id)] = player -- add the player to the table
-    modules.services.player:_save() -- save the player service
-    modules.services.player.onJoin:fire(player) -- fire the event
-end)
-
-modules.libraries.callbacks:connect("onPlayerLeave", function(steam_id, name, peer_id, is_admin, is_auth)
-    -- skip if steam_id is nil or 0
-    if not steam_id or steam_id == 0 then
-        return
-    end
-    modules.libraries.logging:debug("onPlayerLeave", "Player left with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
-    local player = modules.services.player:getPlayer(steam_id)
-    
-    player.inGame = false -- set the player as not in-game
-    modules.services.player.players[tostring(steam_id)] = player -- add the player to the table
-    modules.services.player:_save() -- save the player service
-    modules.services.player.onLeave:fire(player) -- fire the event
+        player.inGame = false -- set the player as not in-game
+        modules.services.player.onLeave:fire(player) -- fire the event
+        modules.services.player.players[tostring(steam_id)] = nil -- remove player after they leave
+        modules.services.player:_save() -- save the player service
+    end)
 end)
 
 function modules.services.player:getPlayer(steam_id)
@@ -57,7 +57,7 @@ end
 function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to use this function, but it is here for compatibility
     for _, player in pairs(self:getPlayers()) do
         modules.libraries.logging:debug("services.player:getPlayerByPeer", "Checking player with peer_id: " .. player.peerId)
-        if player.peerId == tostring(peer_id) then
+        if player.peerId == peer_id then
             modules.libraries.logging:debug("services.player:getPlayerByPeer", "Found player: " .. player.name .. " from peer_id: " .. player.peerId)
             return player -- return the player object if found
         end
