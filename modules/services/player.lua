@@ -11,6 +11,7 @@ modules.onStart:once(function()
     end
 
     modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth)
+        name = modules.services.player:_cleanName(name)
         modules.libraries.logging:debug("onPlayerJoin", "Player joined with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
         local player = modules.services.player:getPlayer(steam_id)
 
@@ -33,13 +34,17 @@ modules.onStart:once(function()
         if not steam_id or steam_id == 0 then
             return
         end
+        name = modules.services.player:_cleanName(name)
+
         modules.libraries.logging:debug("onPlayerLeave", "Player left with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
         local player = modules.services.player:getPlayer(steam_id)
 
-        player.inGame = false -- set the player as not in-game
-        modules.services.player.onLeave:fire(player) -- fire the event
-        modules.services.player.players[tostring(steam_id)] = nil -- remove player after they leave
-        modules.services.player:_save() -- save the player service
+        if player then
+            player.inGame = false -- set the player as not in-game
+            modules.services.player.onLeave:fire(player) -- fire the event
+            modules.services.player.players[tostring(steam_id)] = nil -- remove player after they leave
+            modules.services.player:_save() -- save the player service
+        end
     end)
 end)
 
@@ -133,4 +138,8 @@ end
 
 function modules.services.player:_save()
     modules.libraries.gsave:saveService("player", self)
+end
+
+function modules.services.player:_cleanName(name)
+    return string.gsub(name, "[<]", "")
 end

@@ -31,10 +31,10 @@ modules.onStart:once(function()
 	end)
 
 	modules.libraries.commands:create("simjoin",{},"simulate a join",function(full_message, peer_id, is_admin, is_auth, command, ...)
-		onPlayerJoin(1234567890, "TestPlayer", 10, false, false)
+		onPlayerJoin(1234567890, "Test<Player", 10, false, false)
 	end)
 
 	modules.libraries.commands:create("simleave", {}, "simulate a leave", function(full_message, peer_id, is_admin, is_auth, command, ...)
-		onPlayerLeave(1234567890, "TestPlayer", 10, false, false)
+		onPlayerLeave(1234567890, "Test<Player", 10, false, false)
 	end)
 end)
