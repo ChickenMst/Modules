@@ -13,7 +13,7 @@ modules.onStart:once(function()
     modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth)
         name = modules.services.player:_cleanName(name)
         modules.libraries.logging:debug("onPlayerJoin", "Player joined with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
-        local player = modules.services.player:getPlayer(steam_id)
+        local player = modules.services.player:getPlayer(tostring(steam_id))
 
         if not player then
             player = modules.classes.player:create(peer_id, steam_id, name, is_admin, is_auth)
@@ -34,20 +34,23 @@ modules.onStart:once(function()
         if not steam_id or steam_id == 0 then
             return
         end
+
         name = modules.services.player:_cleanName(name)
 
-        modules.libraries.logging:debug("onPlayerLeave", "Player left with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
-        local player = modules.services.player:getPlayer(steam_id)
+        modules.libraries.logging:debug("onPlayerLeave", "Player left with steam_id: " .. (steam_id or "unknown") .. ", name: " .. name .. ", peer_id: " .. peer_id)
+        local player = modules.services.player:getPlayer(tostring(steam_id))
 
         if player then
             player.inGame = false -- set the player as not in-game
             modules.services.player.onLeave:fire(player) -- fire the event
-            modules.services.player.players[tostring(steam_id)] = player -- remove player after they leave
+            modules.services.player.players[tostring(steam_id)] = player
             modules.services.player:_save() -- save the player service
         end
     end)
 end)
 
+---@param steam_id string
+---@return Player|nil
 function modules.services.player:getPlayer(steam_id)
     for _,player in pairs(self:getPlayers()) do
         modules.libraries.logging:debug("services.player:getPlayer", "Checking player with steam_id: " .. player.steamId)
@@ -59,6 +62,8 @@ function modules.services.player:getPlayer(steam_id)
     modules.libraries.logging:info("services.player:getPlayer", "Player not found with steam_id: " .. steam_id)
 end
 
+---@param peer_id number
+---@return Player|nil
 function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to use this function, but it is here for compatibility
     for _, player in pairs(self:getPlayers()) do
         modules.libraries.logging:debug("services.player:getPlayerByPeer", "Checking player with peer_id: " .. player.peerId)
@@ -69,6 +74,7 @@ function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to 
     end
 end
 
+---@return table<string, Player>
 function modules.services.player:getPlayers()
     return self.players -- return the list of players
 end
@@ -114,7 +120,7 @@ function modules.services.player:_load()
             modules.libraries.logging:debug("services.player:_load", "Skiped loading player: "..player.name)
             goto continue -- skip players with steam_id 0
         end
-        local existingPlayer = self:getPlayer(player.steam_id)
+        local existingPlayer = self:getPlayer(tostring(player.steam_id))
         if not existingPlayer then
             local newPlayer = modules.classes.player:create(
                 player.id,
