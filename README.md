@@ -1,2 +1,2 @@
-# SSSWTool
-personal test repo for SSSWTool
+# Modules
+framework for stormworks addons. it was made to hopefully make making addons easier.
