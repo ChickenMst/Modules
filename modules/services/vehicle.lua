@@ -85,11 +85,11 @@ function modules.services.vehicle:startService()
     end)
 end
 
-function modules.services.vehicles:_save()
+function modules.services.vehicle:_save()
     modules.libraries.gsave:saveService("vehicles", self)
 end
 
-function modules.services.vehicles:_load()
+function modules.services.vehicle:_load()
     local service = modules.libraries.gsave:loadService("vehicles")
 
     if not service then
