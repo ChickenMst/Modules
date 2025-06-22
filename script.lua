@@ -37,4 +37,24 @@ modules.onStart:once(function()
 	modules.libraries.commands:create("simleave", {}, "simulate a leave", function(full_message, peer_id, is_admin, is_auth, command, ...)
 		onPlayerLeave(1234567890, "Test<Player", 10, false, false)
 	end)
+
+	modules.libraries.commands:create("gettps", {}, "get tps", function(full_message, peer_id, is_admin, is_auth, command, ...)
+		local tps = modules.services.tps:getTPS()
+		modules.libraries.logging:debug("tps", "Current TPS: " .. (tostring(tps) or "Nil"))
+	end)
+
+	modules.libraries.commands:create("settps", {}, "set tps", function(full_message, peer_id, is_admin, is_auth, command, ...)
+		local args = {...}
+		if #args == 0 then
+			modules.libraries.logging:warning("settps", "No target TPS provided")
+			return
+		end
+		local targetTPS = tonumber(args[1])
+		if not targetTPS then
+			modules.libraries.logging:warning("settps", "Invalid target TPS provided")
+			return
+		end
+		modules.services.tps:setTPS(targetTPS)
+		modules.libraries.logging:debug("settps", "Target TPS set to: " .. tostring(targetTPS))
+	end)
 end)

@@ -1,9 +1,11 @@
-modules.services.addons = {}
+modules.services.addons = modules.services:createService("addons", "Addons Service", {"ChickenMst"})
 
-modules.services.addons.addons = {} ---@type table <string, Addon>
+function modules.services.addons:initService()
+    self.addons = {} ---@type table <string, Addon>
+end
 
-modules.onStart:connect(function()
-    for name, addon in pairs(modules.services.addons.addons) do
+function modules.services.addons:startService()
+    for name, addon in pairs(self.addons) do
         if addon.enabled then
             modules.libraries.logging:debug("services.addons", "Loading addon: "..name)
             local addonloaded = addon:init() -- runs the init function of the addon
@@ -11,13 +13,13 @@ modules.onStart:connect(function()
                 modules.libraries.logging:debug("services.addons", "Addon "..name.." loaded")
             else
                 modules.libraries.logging:warning("services.addons", "Addon "..name.." failed to load, disableing addon")
-                modules.services.addons:disable(name) -- disable the addon if it fails to load
+                self:disable(name) -- disable the addon if it fails to load
             end
         else
             modules.libraries.logging:debug("services.addons", "Skiped loading addon: "..name..", addon is not enabled")
         end
     end
-end)
+end
 
 ---@param name string
 ---@param addon Addon

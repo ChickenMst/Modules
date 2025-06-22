@@ -1,5 +1,6 @@
 modules.classes = {} -- table of class functions
 
+require "modules.classes.service" -- load the service class
 require "modules.classes.event" -- load the event class
 require "modules.classes.addon" -- load the addon class
 require "modules.classes.loop" -- load the loop class

@@ -1,8 +1,51 @@
 -- init serveices
 modules.services = {}
+modules.services.created = {} -- table of created services
+
+---@param name string
+---@param description string
+---@param authors table<string>
+function modules.services:createService(name, description, authors)
+    if self.created[name] then
+        modules.libraries.logging:error("services:create()", "Attempted to create service '" .. name .. "' that already exists.")
+    end
+
+    local service = modules.classes.service:create(name, description or "N/A", authors or {}) -- create a new service
+
+    self.created[name] = service -- add the service to the created services table
+
+    return service -- return the created service
+end
+
+function modules.services:getService(name)
+    local service = self.created[name] -- get the service by name
+
+    if not service then
+        modules.libraries.logging:error("services:getService()", "Attempted to get service '" .. name .. "' that does not exist.")
+    end
+
+    if not service.hasInit then
+        modules.libraries.logging:warning("services:getService()", "Attempted to get service '" .. name .. "' that is not initialized.")
+    end
+
+    return service -- return the service
+end
+
+function modules.services:_initServices()
+    for _, service in pairs(self.created) do
+        service:_init()
+    end
+end
+
+function modules.services:_startServices()
+    for _, service in pairs(self.created) do
+        service:_start()
+    end
+end
 
 require "modules.services.addons" -- load the addons service
 require "modules.services.loop" -- load the loops service
 require "modules.services.commands" -- load the commands service
-require "modules.services.vehicles" -- load the vehicles service
+require "modules.services.vehicle" -- load the vehicles service
 require "modules.services.player" -- load the player service
+require "modules.services.tps" -- load the TPS service

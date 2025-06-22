@@ -1,19 +1,22 @@
-modules.services.player = {}
+modules.services.player = modules.services:createService("player", "Handles player data and events", {"ChickenMst"})
 
-modules.services.player.onJoin = modules.libraries.events:create()
-modules.services.player.onLeave = modules.libraries.events:create()
+function modules.services.player:initService()
+    self.onJoin = modules.libraries.events:create()
+    self.onLeave = modules.libraries.events:create()
 
-modules.services.player.players = {} ---@type table<string, Player>
+    self.players = {} ---@type table<string, Player>
+end
 
-modules.onStart:once(function()
+
+function modules.services.player:startService()
     if modules.addonReason == "reload" then
-        modules.services.player:_load() -- load the player service on creationTime
+        self:_load() -- load the player service on creationTime
     end
 
     modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth)
-        name = modules.services.player:_cleanName(name)
+        name = self:_cleanName(name)
         modules.libraries.logging:debug("onPlayerJoin", "Player joined with steam_id: " .. steam_id .. ", name: " .. name .. ", peer_id: " .. peer_id)
-        local player = modules.services.player:getPlayer(tostring(steam_id))
+        local player = self:getPlayer(tostring(steam_id))
 
         if not player then
             player = modules.classes.player:create(peer_id, steam_id, name, is_admin, is_auth)
@@ -24,9 +27,9 @@ modules.onStart:once(function()
         end
 
         player.inGame = true -- set the player as in-game
-        modules.services.player.players[tostring(steam_id)] = player -- add the player to the table
-        modules.services.player:_save() -- save the player service
-        modules.services.player.onJoin:fire(player) -- fire the event
+        self.players[tostring(steam_id)] = player -- add the player to the table
+        self:_save() -- save the player service
+        self.onJoin:fire(player) -- fire the event
     end)
 
     modules.libraries.callbacks:connect("onPlayerLeave", function(steam_id, name, peer_id, is_admin, is_auth)
@@ -35,19 +38,19 @@ modules.onStart:once(function()
             return
         end
 
-        name = modules.services.player:_cleanName(name)
+        name = self:_cleanName(name)
 
         modules.libraries.logging:debug("onPlayerLeave", "Player left with steam_id: " .. (steam_id or "unknown") .. ", name: " .. name .. ", peer_id: " .. peer_id)
-        local player = modules.services.player:getPlayer(tostring(steam_id))
+        local player = self:getPlayer(tostring(steam_id))
 
         if player then
             player.inGame = false -- set the player as not in-game
-            modules.services.player.onLeave:fire(player) -- fire the event
-            modules.services.player.players[tostring(steam_id)] = player
-            modules.services.player:_save() -- save the player service
+            self.onLeave:fire(player) -- fire the event
+            self.players[tostring(steam_id)] = player
+            self:_save() -- save the player service
         end
     end)
-end)
+end
 
 ---@param steam_id string
 ---@return Player|nil

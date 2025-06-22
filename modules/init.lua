@@ -45,6 +45,9 @@ modules.libraries.callbacks:once("onCreate", function(is_world_create)
         }
     end
 
+    modules.services:_initServices() -- initialize all services
+    modules.services:_startServices() -- start all services
+
     modules.onStart:fire()
 end)
 
