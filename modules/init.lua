@@ -23,37 +23,35 @@ function modules:_setIsDedicated()
     modules.libraries.logging:info("modules.isDedicated", tostring(modules.isDedicated))
 end
 
-function modules:_setAddonReason(is_world_create)
-    if is_world_create then
-        self.addonReason = "create"
-    else
-        self.addonReason = "reload"
-    end
-    modules.libraries.logging:info("modules.addonReason", self.addonReason)
-end
-
 -- connect into onCreate for setup of modules
 modules.libraries.callbacks:once("onCreate", function(is_world_create)
-    modules:_setIsDedicated() -- set the isDedicated variable
-    modules:_setAddonReason(is_world_create) -- set the addonReason variable
+    local function setup(startTime, is_world_create)
+        modules.libraries.callbacks:once("onTick", function()
+            local took = server.getTimeMillisec() - startTime
+            modules.addonReason = is_world_create and "create" or (took < 1000 and "reload" or "load")
+            modules.libraries.logging:info("modules.addonReason", modules.addonReason)
 
-    if not g_savedata then
-        modules.libraries.logging:warning("modules.onCreate", "g_savedata is not initialized, initializing.")
-        -- setup gsave
-        g_savedata = {
-            modules = {
-                services = {}
-            }
-        }
+            if not g_savedata then
+                modules.libraries.logging:warning("modules.onCreate", "g_savedata is not initialized, initializing.")
+                -- setup gsave
+                g_savedata = {
+                    modules = {
+                        services = {}
+                    }
+                }
+            end
+
+            modules.services:_initServices() -- initialize all services
+            modules.onServiceInit:fire() -- fire the onServiceInit event
+
+            modules.services:_startServices() -- start all services
+
+            modules.libraries.logging:debug("onStart", "modules started. fireing onStart event")
+            modules.onStart:fire()
+        end)
     end
 
-    modules.services:_initServices() -- initialize all services
-    modules.onServiceInit:fire() -- fire the onServiceInit event
-
-    modules.services:_startServices() -- start all services
-
-    modules.libraries.logging:debug("onStart", "modules started. fireing onStart event")
-    modules.onStart:fire()
+    setup(server.getTimeMillisec(), is_world_create)
 end)
 
 -- SSSWTool tracing support, since modules messes with callbacks via `_ENV` at runtime.

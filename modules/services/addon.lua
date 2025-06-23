@@ -69,27 +69,28 @@ end
 
 function modules.services.addon:_loadAddons()
     for name, addon in pairs(self.addons) do
-        if not addon.hasStarted then
-            modules.libraries.logging:debug("services.addon", "Loading addon: "..name)
-            if not addon.hasInit then
-                modules.libraries.logging:debug("services.addon", "Initializing addon: "..name)
-                if addon:_init() then
-                    modules.libraries.logging:debug("services.addon", "Addon "..name.." initialized")
-                    if addon:_start() then
-                        modules.libraries.logging:debug("services.addon", "Addon "..name.." started")
-                    else
-                        modules.libraries.logging:error("services.addon", "Addon "..name.." failed to start")
-                        self:disable(name) -- disable the addon if it fails to start
-                    end
-                else
-                    modules.libraries.logging:warning("services.addon", "Addon "..name.." failed to initialize, disableing addon")
-                    self:disable(name) -- disable the addon if it fails to load
-                end
+        modules.libraries.logging:debug("services.addon", "Loading addon: "..name)
+        if not addon.hasInit then
+            modules.libraries.logging:debug("services.addon", "Initializing addon: "..name)
+            if addon:_init() then
+                modules.libraries.logging:debug("services.addon", "Addon "..name.." initialized")
             else
-                modules.libraries.logging:debug("services.addon", "Addon "..name.." already initialized")
+                modules.libraries.logging:warning("services.addon", "Addon "..name.." failed to initialize, disableing addon")
+                self:disable(name) -- disable the addon if it fails to load
             end
         else
-            modules.libraries.logging:debug("services.addon", "Skiped loading Addon "..name..". already started")
+            modules.libraries.logging:debug("services.addon", "Skipped Initializing Addon "..name..". already initialized")
+        end
+
+        if not addon.hasStarted and addon.hasInit then
+            if addon:_start() then
+                modules.libraries.logging:debug("services.addon", "Addon "..name.." started")
+            else
+                modules.libraries.logging:error("services.addon", "Addon "..name.." failed to start")
+                self:disable(name) -- disable the addon if it fails to start
+            end
+        else
+            modules.libraries.logging:debug("services.addon", "Skipped starting Addon "..name..". already started")
         end
     end
 end

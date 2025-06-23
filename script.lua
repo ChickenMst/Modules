@@ -1,10 +1,14 @@
 require "modules"
 
-modules.libraries.callbacks:connect("onCreate", function(is_world_create)
-	if is_world_create then
+modules.onStart:once(function()
+	if modules.addonReason == "create" then
 		modules.libraries.logging:info("onCreate()", "World created")
-	else
+	elseif modules.addonReason == "reload" then
 		modules.libraries.logging:info("onCreate()", "Script reloaded")
+	elseif modules.addonReason == "load" then
+		modules.libraries.logging:info("onCreate()", "World loaded")
+	else
+		modules.libraries.logging:info("onCreate()", "Unknown world state: " .. tostring(modules.addonReason))
 	end
 end)
 
