@@ -10,6 +10,8 @@ modules.addonReason = "unknown"
 
 modules.onStart = modules.classes.event:create() -- event for when the server starts
 
+modules.onServiceInit = modules.classes.event:create() -- event for when a service is initialized
+
 -- add services and addons after loading everything else
 require "modules.services" -- load the services
 require "modules.addons" -- load the addons
@@ -46,8 +48,11 @@ modules.libraries.callbacks:once("onCreate", function(is_world_create)
     end
 
     modules.services:_initServices() -- initialize all services
+    modules.onServiceInit:fire() -- fire the onServiceInit event
+
     modules.services:_startServices() -- start all services
 
+    modules.libraries.logging:debug("onStart", "modules started. fireing onStart event")
     modules.onStart:fire()
 end)
 

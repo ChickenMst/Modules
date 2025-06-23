@@ -43,7 +43,7 @@ function modules.services:_startServices()
     end
 end
 
-require "modules.services.addons" -- load the addons service
+require "modules.services.addon" -- load the addons service
 require "modules.services.loop" -- load the loops service
 require "modules.services.commands" -- load the commands service
 require "modules.services.vehicle" -- load the vehicles service

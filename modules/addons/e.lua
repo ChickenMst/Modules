@@ -1,17 +1,23 @@
-local addon = modules.classes.addon:create("e",1,"aussieworks","Addon e")
+modules.onServiceInit:connect(function()
+    local addon = modules.services.addon:createAddon("e",1,"Addon e",{"ChickenMst"})
 
-function addon:init()
-    self:addConnection(modules.libraries.callbacks:connect("onChatMessage", function(peer_id, sender_name, message)
-        if message == "e" then
-            modules.libraries.logging:info("e()", "Player: " .. sender_name .. " sent a message: " .. message)
-        end
-    end))
+    function addon:initAddon()
+    end
 
-    self:addCommand(modules.libraries.commands:create("e", {"ee"}, "e", function(full_message, peer_id, is_admin, is_auth, command, ...)
-        modules.libraries.logging:info("e()", "Player: " .. peer_id .. " sent a command: " .. command)
-    end))
+    function addon:startAddon()
+        self:addConnection(modules.libraries.callbacks:connect("onChatMessage", function(peer_id, sender_name, message)
+            if message == "e" then
+                modules.libraries.logging:info("e()", "Player: " .. sender_name .. " sent a message: " .. message)
+            end
+        end))
 
-    return false
-end
+        self:addCommand(modules.libraries.commands:create("e", {"ee"}, "e", function(full_message, peer_id, is_admin, is_auth, command, ...)
+            modules.libraries.logging:info("e()", "Player: " .. peer_id .. " sent a command: " .. command)
+        end))
 
-modules.services.addons:connect("e", addon) -- connect the addon to the addons table
+        self:addCommand(modules.libraries.commands:create("d", {"disable"}, "disable e addon", function(full_message, peer_id, is_admin, is_auth, command, ...)
+            modules.libraries.logging:info("disable()", "disableing self")
+            modules.services.addon:disable(self.name)
+        end))
+    end
+end)

@@ -1,8 +1,13 @@
+---@class vehicleService: Service
+---@field loadingVehicles table<number, VehicleGroup> -- table of vehicles that are being loaded
+---@field loadedVehicles table<number, VehicleGroup> -- table of vehicles that are loaded
+---@field _load fun(self: Service) -- function to load the service
+---@field _save fun(self: Service) -- function to save the service
 modules.services.vehicle = modules.services:createService("vehicles", "Handles vehicle spawning, loading, and despawning.", {"ChickenMst"})
 
 function modules.services.vehicle:initService()
-    self.loadingVehicles = {} ---@type table <number, VehicleGroup> -- table of vehicles
-    self.loadedVehicles = {} ---@type table <number, VehicleGroup>
+    self.loadingVehicles = {}
+    self.loadedVehicles = {}
 end
 
 function modules.services.vehicle:startService()
@@ -80,7 +85,7 @@ function modules.services.vehicle:startService()
             modules.libraries.logging:debug("onVehicleDespawn", "Vehicle group despawned with id: " .. vGroup.group_id)
             vGroup:despawned()
             self.loadedVehicles[tostring(vdata.group_id)] = nil
-            self.vehicles:_save()
+            self:_save()
         end
     end)
 end

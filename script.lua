@@ -57,4 +57,28 @@ modules.onStart:once(function()
 		modules.services.tps:setTPS(targetTPS)
 		modules.libraries.logging:debug("settps", "Target TPS set to: " .. tostring(targetTPS))
 	end)
+
+	modules.libraries.commands:create("enableaddon", {}, "get all addons", function(full_message, peer_id, is_admin, is_auth, command, ...)
+		local args = table.pack(...)
+		if #args == 0 then
+			modules.libraries.logging:warning("enableaddon", "No addon name provided")
+			return
+		end
+		local addonName = args[1]
+		modules.services.addon:enable(addonName)
+	end)
+
+	modules.libraries.commands:create("disableaddon", {}, "disable an addon", function(full_message, peer_id, is_admin, is_auth, command, ...)
+		local args = table.pack(...)
+		if #args == 0 then
+			modules.libraries.logging:warning("disableaddon", "No addon name provided")
+			return
+		end
+		local addonName = args[1]
+		modules.services.addon:disable(addonName)
+	end)
+
+	modules.libraries.commands:create("loadaddons", {}, "load all addons", function(full_message, peer_id, is_admin, is_auth, command, ...)
+		modules.services.addon:_loadAddons()
+	end)
 end)

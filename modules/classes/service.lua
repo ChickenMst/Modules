@@ -1,6 +1,13 @@
 modules.classes.service = {}
 
+---@param name string
+---@param description string
+---@param authors table<string>
+---@return Service
 function modules.classes.service:create(name, description, authors)
+    ---@class Service
+    ---@field initService function
+    ---@field startService function
     local service = {
         name = name,
         description = description,
@@ -37,6 +44,7 @@ function modules.classes.service:create(name, description, authors)
             return
         end
 
+        modules.libraries.logging:debug("service:_start()", "Starting service '" .. self.name .. "'")
         self.hasStarted = true
 
         if not self.startService then

@@ -2,20 +2,24 @@ modules.classes.addon = {} -- table of addon functions
 
 ---@param name string
 ---@param version string|number
----@param author string
+---@param authors table<string>
 ---@param description string
 ---@return Addon
-function modules.classes.addon:create(name, version, author, description)
+function modules.classes.addon:create(name, version, description, authors)
     ---@class Addon
-    ---@field init function
+    ---@field initAddon function
+    ---@field startAddon function
     local addon = {
         name = name,
         version = version,
-        author = author,
+        authors = authors,
         description = description,
         enabled = true,
         connections = {}, ---@type table<any, EventConnection>
         commands = {}, ---@type table<string, Command>
+
+        hasInit = false,
+        hasStarted = false
     }
 
     -- enables the addon so it can get run
@@ -25,7 +29,58 @@ function modules.classes.addon:create(name, version, author, description)
 
     -- disables addon so it doesnt get run
     function addon:disable()
+        self:removeConnections() -- remove all connections of the addon
+        self:removeCommands() -- remove all commands of the addon
+        self.hasStarted = false -- reset the started state
         self.enabled = false
+    end
+
+    function addon:_init()
+        if not self.enabled then
+            modules.libraries.logging:debug("addon:_init()", "Addon '" .. self.name .. "' is disabled, skipping initialization.")
+            return
+        end
+
+        if self.hasInit then
+            modules.libraries.logging:warning("addon:_init()", "Addon '" .. self.name .. "' is already initialized.")
+            return
+        end
+
+        modules.libraries.logging:debug("addon:_init()", "Initializing addon '" .. self.name .. "'")
+        self.hasInit = true
+
+        if not self.initAddon then
+            return
+        end
+
+        self:initAddon() -- run the init function of the addon
+        return true
+    end
+
+    function addon:_start()
+        if not self.enabled then
+            modules.libraries.logging:debug("addon:_start()", "Addon '" .. self.name .. "' is disabled, skipping start.")
+            return
+        end
+
+        if self.hasStarted then
+            modules.libraries.logging:warning("addon:_start()", "Attempted to start addon '" .. self.name .. "' that is already started.")
+            return
+        end
+
+        if not self.hasInit then
+            modules.libraries.logging:error("addon:_start()", "Attempted to start addon '" .. self.name .. "' that is not initialized.")
+            return
+        end
+
+        self.hasStarted = true
+
+        if not self.startAddon then
+            return
+        end
+
+        self:startAddon() -- run the start function of the addon
+        return true
     end
 
     ---@param connection EventConnection|nil
