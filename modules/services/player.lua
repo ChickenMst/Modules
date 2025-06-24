@@ -1,10 +1,12 @@
+---@class playerService: Service
+---@field players table<string, Player> -- table of players
 modules.services.player = modules.services:createService("player", "Handles player data and events", {"ChickenMst"})
 
 function modules.services.player:initService()
     self.onJoin = modules.libraries.events:create()
     self.onLeave = modules.libraries.events:create()
 
-    self.players = {} ---@type table<string, Player>
+    self.players = {}
 end
 
 

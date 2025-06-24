@@ -1,3 +1,5 @@
+---@class loopService: Service
+---@field loops table<number, Loop> -- table of loops
 modules.services.loop = modules.services:createService("loop", "Service for creating and managing loops", {"ChickenMst"})
 
 function modules.services.loop:initService()

@@ -23,7 +23,7 @@ function modules.classes.service:create(name, description, authors)
             return
         end
 
-        modules.libraries.logging:debug("service:_init()", "Initializing service '" .. self.name .. "'")
+        modules.libraries.logging:info("service:_init()", "Initializing service '" .. self.name .. "'")
         self.hasInit = true
 
         if not self.initService then
@@ -44,7 +44,7 @@ function modules.classes.service:create(name, description, authors)
             return
         end
 
-        modules.libraries.logging:debug("service:_start()", "Starting service '" .. self.name .. "'")
+        modules.libraries.logging:info("service:_start()", "Starting service '" .. self.name .. "'")
         self.hasStarted = true
 
         if not self.startService then

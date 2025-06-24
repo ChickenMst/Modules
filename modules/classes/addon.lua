@@ -106,7 +106,7 @@ function modules.classes.addon:create(name, version, description, authors)
 
     function addon:removeCommands()
         for i, command in pairs(self.commands) do
-            modules.libraries.commands:remove(command.commandstr) -- remove the command from the commands table
+            modules.services.command:remove(command.commandstr) -- remove the command from the commands table
             self.commands[i] = nil -- remove the command from the addon
         end
     end

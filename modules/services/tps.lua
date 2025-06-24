@@ -1,3 +1,7 @@
+---@class tpsService: Service
+---@field targetTPS number -- target TPS (ticks per second)
+---@field tps number -- current TPS (ticks per second)
+---@field _last number -- last tick time in milliseconds
 modules.services.tps = modules.services:createService("tps", "Service for calculating and managing tps", {"ChickenMst"})
 
 function modules.services.tps:initService()
