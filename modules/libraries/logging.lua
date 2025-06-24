@@ -11,6 +11,8 @@ modules.libraries.logging.logtypes = {
 
 modules.libraries.logging.loglevel = modules.libraries.logging.logtypes.DEBUG -- set the default log level to ERROR
 
+modules.libraries.logging.loggingdetail = "full" -- the logging detail, can be "full" or "minimal"
+
 modules.libraries.logging.loggingmode = "chat" -- set the default log mode to console
 
 ---@param logtype number

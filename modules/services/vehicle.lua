@@ -26,7 +26,9 @@ function modules.services.vehicle:startService()
             vGroup:addVehicle(vehicle)
         end
 
-        modules.libraries.logging:debug("onVehicleSpawn", "Vehicle spawned with id: " .. vehicle_id .. ", group id: " .. group_id)
+        if modules.libraries.logging.loggingdetail == "full" then
+            modules.libraries.logging:debug("onVehicleSpawn", "Vehicle spawned with id: " .. vehicle_id .. ", group id: " .. group_id)
+        end
         self.loadingVehicles[group_id] = vGroup
         self:_save()
     end)

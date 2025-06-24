@@ -58,7 +58,9 @@ end
 ---@return Player|nil
 function modules.services.player:getPlayer(steam_id)
     for _,player in pairs(self:getPlayers()) do
-        modules.libraries.logging:debug("services.player:getPlayer", "Checking player with steam_id: " .. player.steamId)
+        if modules.libraries.logging.loggingdetail == "full" then
+            modules.libraries.logging:debug("services.player:getPlayer", "Checking player with steam_id: " .. player.steamId)
+        end
         if player.steamId == tostring(steam_id) then
             modules.libraries.logging:debug("services.player:getPlayer", "Found player: " .. player.name .. " from steam_id: " .. player.steamId)
             return player -- return the player object if found
