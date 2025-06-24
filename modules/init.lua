@@ -6,7 +6,7 @@ require "modules.libraries" -- load the libraries
 
 modules.isDedicated = false -- is the server dedicated?
 
-modules.addonReason = "unknown"
+modules.addonReason = "unknown" -- can be "create", "reload", or "load". or unknown if not set
 
 modules.onStart = modules.classes.event:create() -- event for when the server starts
 

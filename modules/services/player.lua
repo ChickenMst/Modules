@@ -11,7 +11,7 @@ end
 
 
 function modules.services.player:startService()
-    if modules.addonReason == "reload" then
+    if modules.addonReason ~= "create" then
         self:_load() -- load the player service on creationTime
     end
 
@@ -128,8 +128,9 @@ function modules.services.player:_load()
             end
             ::continue::
         end
-        self:_verifyOnlinePlayers() -- verify online players after loading
     end
+
+    self:_verifyOnlinePlayers() -- verify online players after loading
 
     for _, player in pairs(server.getPlayers()) do
         if player.steam_id == 0 then
