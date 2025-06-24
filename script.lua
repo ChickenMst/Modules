@@ -30,6 +30,15 @@ modules.onStart:once(function()
 		onPlayerLeave(1234567890, "Test<Player", 10, false, false)
 	end)
 
+	modules.services.command:create("players", {}, "get all players", function(full_message, peer_id, is_admin, is_auth, command, ...)
+		local players = modules.services.player:getOnlinePlayers()
+		local str = "Online Players:\n"
+		for _, player in pairs(players) do
+			str = str .. "SteamID: " .. player.steamId .. ", Name: " .. player.name .. ", PeerID: " .. player.peerId .. "\n"
+		end
+		modules.libraries.logging:info("players", str)
+	end)
+
 	modules.services.command:create("gettps", {}, "get tps", function(full_message, peer_id, is_admin, is_auth, command, ...)
 		local tps = modules.services.tps:getTPS()
 		modules.libraries.logging:info("tps", "Current TPS: " .. (tostring(tps) or "Nil"))

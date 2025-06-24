@@ -86,6 +86,17 @@ function modules.services.player:getPlayers()
     return self.players -- return the list of players
 end
 
+---@return table<string, Player>
+function modules.services.player:getOnlinePlayers() -- returns a table of players that are currently in-game
+    local onlinePlayers = {}
+    for _, player in pairs(self:getPlayers()) do
+        if player.inGame then
+            onlinePlayers[tostring(player.steamId)] = player -- add the player to the table if they are in-game
+        end
+    end
+    return onlinePlayers -- return the list of online players
+end
+
 function modules.services.player:_load()
     local service = modules.libraries.gsave:loadService("player")
     if not service then
