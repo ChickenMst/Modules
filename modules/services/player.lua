@@ -171,7 +171,7 @@ function modules.services.player:_verifyOnlinePlayers()
 
     for _, player in pairs(self.players) do
         player.inGame = onlinePlayers[tostring(player.steamId)] ~= nil -- set inGame based on onlinePlayers
-        if not player.inGame and modules.addonReason == "saveload" then
+        if not player.inGame and modules.addonReason == "load" then
             player.peerId = -1
         end
     end
