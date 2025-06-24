@@ -107,14 +107,14 @@ end
 ---@param name string
 ---@return Event
 function modules.libraries.callbacks:_initCallback(name)
-    local event = modules.libraries.callbacks.events[name]
+    local event = self.events[name]
 
     if event then
         return event
     end
 
     if not event then
-        event = modules.libraries.events:create() -- create a new event object
+        event = modules.libraries.event:create() -- create a new event object
         self.events[name] = event -- add the event to the table
     end
 

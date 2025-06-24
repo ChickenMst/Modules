@@ -88,7 +88,7 @@ function modules.classes.event:create()
             local connection = self.connections[connectionId]
             local result = connection:fire(...)
 
-            if result == modules.libraries.events.removeConnection then
+            if result == modules.libraries.event.removeConnection then
                 self:disconnect(connection)
             end
         end

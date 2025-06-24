@@ -12,8 +12,8 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded)
         vehicles = {}, ---@type Vehicle[]
         owner = owner,
         spawnTime = spawnTime or server.getTimeMillisec(),
-        onDespawn = modules.libraries.events:create(),
-        onLoaded = modules.libraries.events:create(),
+        onDespawn = modules.libraries.event:create(),
+        onLoaded = modules.libraries.event:create(),
         isLoaded = loaded or false,
     }
 

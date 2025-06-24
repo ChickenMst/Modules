@@ -5,7 +5,7 @@ modules.onStart:once(function()
 		local args = table.pack(...)
 		modules.libraries.logging:debug("pinfo", "Command executed by peer_id: " .. tostring(peer_id))
 		local player = modules.services.player:getPlayerByPeer(tonumber(args[1]) or peer_id)
-		modules.libraries.logging:debug("pinfo", "Player info: " .. (player and player.steamId or "Nil") .. ", " .. (player and player.name or "Nil") .. ", " .. (player and tostring(player.inGame) or "Nil"))
+		modules.libraries.logging:info("pinfo", "Player info: " .. (player and player.steamId or "Nil") .. ", " .. (player and player.name or "Nil") .. ", " .. (player and tostring(player.inGame) or "Nil"))
 	end)
 
 	modules.services.command:create("loglevel",{"ll"}, "set the log level", function(full_message, peer_id, is_admin, is_auth, command, ...)
@@ -32,7 +32,7 @@ modules.onStart:once(function()
 
 	modules.services.command:create("gettps", {}, "get tps", function(full_message, peer_id, is_admin, is_auth, command, ...)
 		local tps = modules.services.tps:getTPS()
-		modules.libraries.logging:debug("tps", "Current TPS: " .. (tostring(tps) or "Nil"))
+		modules.libraries.logging:info("tps", "Current TPS: " .. (tostring(tps) or "Nil"))
 	end)
 
 	modules.services.command:create("settps", {}, "set tps", function(full_message, peer_id, is_admin, is_auth, command, ...)
@@ -47,7 +47,7 @@ modules.onStart:once(function()
 			return
 		end
 		modules.services.tps:setTPS(targetTPS)
-		modules.libraries.logging:debug("settps", "Target TPS set to: " .. tostring(targetTPS))
+		modules.libraries.logging:info("settps", "Target TPS set to: " .. tostring(targetTPS))
 	end)
 
 	modules.services.command:create("enableaddon", {}, "get all addons", function(full_message, peer_id, is_admin, is_auth, command, ...)

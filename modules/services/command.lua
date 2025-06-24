@@ -68,7 +68,7 @@ function modules.services.command:create(commandstr, alias, description, func)
 
     -- if didnt return false, create command
     local command = modules.classes.command:create(commandstr, alias, description, func)
-    modules.libraries.logging:info("services.command", "Command created: " .. commandstr)
+    modules.libraries.logging:debug("services.command", "Command created: " .. commandstr)
 
     self.commands[commandstr] = command -- add command to table
 

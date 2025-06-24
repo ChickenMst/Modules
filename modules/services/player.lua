@@ -3,8 +3,8 @@
 modules.services.player = modules.services:createService("player", "Handles player data and events", {"ChickenMst"})
 
 function modules.services.player:initService()
-    self.onJoin = modules.libraries.events:create()
-    self.onLeave = modules.libraries.events:create()
+    self.onJoin = modules.libraries.event:create()
+    self.onLeave = modules.libraries.event:create()
 
     self.players = {}
 end
