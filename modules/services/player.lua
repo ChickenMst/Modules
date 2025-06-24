@@ -131,6 +131,7 @@ function modules.services.player:_load()
             end
             ::continue::
         end
+        self:_verifyOnlinePlayers() -- verify online players after loading
     end
 
     for _, player in pairs(server.getPlayers()) do
@@ -162,6 +163,18 @@ end
 
 function modules.services.player:_save()
     modules.libraries.gsave:saveService("player", self)
+end
+
+function modules.services.player:_verifyOnlinePlayers()
+    local onlinePlayers = {}
+
+    for _, player in pairs(server.getPlayers()) do
+        onlinePlayers[tostring(player.steam_id)] = true -- mark the player as online
+    end
+
+    for _, player in pairs(self.players) do
+        player.inGame = onlinePlayers[tostring(player.steamId)] ~= nil -- set inGame based on onlinePlayers
+    end
 end
 
 function modules.services.player:_cleanName(name)
