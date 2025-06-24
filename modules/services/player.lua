@@ -29,6 +29,7 @@ function modules.services.player:startService()
         end
 
         player.inGame = true -- set the player as in-game
+        player.peerId = peer_id -- update the peer_id
         self.players[tostring(steam_id)] = player -- add the player to the table
         self:_save() -- save the player service
         self.onJoin:fire(player) -- fire the event
@@ -99,10 +100,6 @@ end
 
 function modules.services.player:_load()
     local service = modules.libraries.gsave:loadService("player")
-    if not service then
-        modules.libraries.logging:warning("services.player:_load", "Skiped loading player service, no data found.")
-        return
-    end
 
     if service.players ~= nil then
         for _, playerData in pairs(service.players) do
@@ -174,6 +171,9 @@ function modules.services.player:_verifyOnlinePlayers()
 
     for _, player in pairs(self.players) do
         player.inGame = onlinePlayers[tostring(player.steamId)] ~= nil -- set inGame based on onlinePlayers
+        if not player.inGame and modules.addonReason == "saveload" then
+            player.peerId = -1
+        end
     end
 end
 
