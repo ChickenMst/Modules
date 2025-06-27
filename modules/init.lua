@@ -29,6 +29,7 @@ modules.libraries.callbacks:once("onCreate", function(is_world_create)
         modules.libraries.callbacks:once("onTick", function()
             local took = server.getTimeMillisec() - startTime
             modules.addonReason = is_world_create and "create" or (took < 1000 and "reload" or "load")
+            modules:_setIsDedicated() -- set the isDedicated variable
             modules.libraries.logging:info("modules.addonReason", modules.addonReason)
 
             if not g_savedata then
