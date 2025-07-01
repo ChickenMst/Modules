@@ -9,13 +9,15 @@ end
 function modules.services.command:startService()
     modules.libraries.callbacks:connect("onCustomCommand", function(full_message, peer_id, is_admin, is_auth, command, ...)
         command = self:cleanCommandString(command)
+        args = table.pack(...) -- pack the arguments into a table
+        local player = modules.services.player:getPlayerByPeer(peer_id)
         if self.commands[command] then
-            self.commands[command]:run(full_message, peer_id, is_admin, is_auth, command, ...)
+            self.commands[command]:run(player, command, args)
         elseif not self.commands[command] then
             for _, cmd in pairs(self.commands) do
                 for _, alias in pairs(cmd.alias) do
                     if alias == command then
-                        cmd:run(full_message, peer_id, is_admin, is_auth, command, ...)
+                        cmd:run(player, command, args)
                         return
                     end
                 end
@@ -28,7 +30,7 @@ end
 ---@param commandstr string
 ---@param alias table
 ---@param description string
----@param func fun(full_message, peer_id, is_admin, is_auth, command, ...)
+---@param func fun(player:Player, command, ...)
 ---@return Command|nil
 function modules.services.command:create(commandstr, alias, description, func)
     commandstr = self:cleanCommandString(commandstr) -- clean command string
