@@ -74,7 +74,9 @@ end
 ---@return Player|nil
 function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to use this function, but it is here for compatibility
     for _, player in pairs(self:getPlayers()) do
-        modules.libraries.logging:debug("services.player:getPlayerByPeer", "Checking player with peer_id: " .. player.peerId)
+        if modules.libraries.logging.loggingdetail == "full" then
+            modules.libraries.logging:debug("services.player:getPlayerByPeer", "Checking player with peer_id: " .. player.peerId)
+        end
         if player.peerId == peer_id then
             modules.libraries.logging:debug("services.player:getPlayerByPeer", "Found player: " .. player.name .. " from peer_id: " .. player.peerId)
             return player -- return the player object if found
