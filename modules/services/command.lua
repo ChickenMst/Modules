@@ -12,12 +12,12 @@ function modules.services.command:startService()
         args = table.pack(...) -- pack the arguments into a table
         local player = modules.services.player:getPlayerByPeer(peer_id)
         if self.commands[command] then
-            self.commands[command]:run(player, command, args)
+            self.commands[command]:run(player, full_message, command, args)
         elseif not self.commands[command] then
             for _, cmd in pairs(self.commands) do
                 for _, alias in pairs(cmd.alias) do
                     if alias == command then
-                        cmd:run(player, command, args)
+                        cmd:run(player, full_message, command, args)
                         return
                     end
                 end
@@ -30,7 +30,7 @@ end
 ---@param commandstr string
 ---@param alias table
 ---@param description string
----@param func fun(player:Player, command, ...)
+---@param func fun(player:Player, full_message, command, args)
 ---@return Command|nil
 function modules.services.command:create(commandstr, alias, description, func)
     commandstr = self:cleanCommandString(commandstr) -- clean command string
