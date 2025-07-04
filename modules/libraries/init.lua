@@ -6,3 +6,4 @@ require "modules.libraries.chat" -- load the chat library
 require "modules.libraries.event" -- load the event library
 require "modules.libraries.callbacks" -- load the callbacks library
 require "modules.libraries.gsave" -- load the gsave library
+require "modules.libraries.json" -- load the json library

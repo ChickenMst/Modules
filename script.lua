@@ -80,6 +80,22 @@ modules.onStart:once(function()
 	modules.services.command:create("loadaddons", {}, "load all addons", function(player, full_message, command, args)
 		modules.services.addon:_loadAddons()
 	end)
+
+	modules.services.command:create("jsontest", {}, "test json library", function(player, full_message, command, args)
+		local testTable = {
+			name = "Test",
+			value = 123,
+			nested = {
+				foo = "bar",
+				baz = {1, 2, 3}
+			}
+		}
+		local jsonString = modules.libraries.json:encode(testTable)
+		modules.libraries.logging:info("jsontest", "Encoded JSON: " .. jsonString)
+
+		local decodedTable = modules.libraries.json:decode(jsonString)
+		modules.libraries.logging:info("jsontest", "Decoded Table: " .. tostring(decodedTable))
+	end)
 end)
 
 modules.onStart:once(function()
