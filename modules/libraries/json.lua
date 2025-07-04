@@ -1,363 +1,261 @@
-modules.libraries.json = { _version = "0.1.2" }
+modules.libraries.json = {}
 
--------------------------------------------------------------------------------
--- Credit
--------------------------------------------------------------------------------
-
--- This is a modified version of https://github.com/rxi/json.lua/blob/master/json.lua
-
--------------------------------------------------------------------------------
--- Encode
--------------------------------------------------------------------------------
-
-modules.libraries.json._escape_char_map = {
-  [ "\\" ] = "\\",
-  [ "\"" ] = "\"",
-  [ "\b" ] = "b",
-  [ "\f" ] = "f",
-  [ "\n" ] = "n",
-  [ "\r" ] = "r",
-  [ "\t" ] = "t",
-}
-
-modules.libraries.json._escape_char_map_inv = { [ "/" ] = "/" }
-for k, v in pairs(modules.libraries.json._escape_char_map) do
-  modules.libraries.json._escape_char_map_inv[v] = k
-end
-
-
-function modules.libraries.json._escape_char(c)
-  return "\\" .. (modules.libraries.json._escape_char_map[c] or string.format("u%04x", c:byte()))
-end
-
-
-function modules.libraries.json._encode_nil(val)
-  return "null"
-end
-
-
-function modules.libraries.json:_encode_table(val, stack)
-  local res = {}
-  stack = stack or {}
-
-  -- Circular reference?
-  if stack[val] then modules.libraries.logging:error("libraries.json","circular reference") end
-
-  stack[val] = true
-
-  if rawget(val, 1) ~= nil or next(val) == nil then
-    -- Treat as array -- check keys are valid and it is not sparse
-    local n = 0
-    for k in pairs(val) do
-      if type(k) ~= "number" then
-        modules.libraries.logging:error("libraries.json","invalid table: mixed or invalid key types")
-      end
-      n = n + 1
+---@param obj any
+---@return "nil"|"boolean"|"number"|"string"|"table"|"function"|"array"
+function modules.libraries.json:kindOf(obj)
+    if type(obj) ~= "table" then
+        return type(obj) ---@diagnostic disable-line
     end
-    if n ~= #val then
-      modules.libraries.logging:error("libraries.json","invalid table: sparse array")
-    end
-    -- Encode
-    for i, v in ipairs(val) do
-      table.insert(res, self._encode(v, stack))
-    end
-    stack[val] = nil
-    return "[" .. table.concat(res, ",") .. "]"
 
-  else
-    -- Treat as an object
-    for k, v in pairs(val) do
-      if type(k) ~= "string" then
-        modules.libraries.logging:error("libraries.json","invalid table: mixed or invalid key types")
-      end
-      table.insert(res, self:_encode(k, stack) .. ":" .. self:_encode(v, stack))
-    end
-    stack[val] = nil
-    return "{" .. table.concat(res, ",") .. "}"
-  end
-end
+    local i = 1
 
-
-function modules.libraries.json:_encode_string(val)
-  return '"' .. val:gsub('[%z\1-\31\\"]', self._escape_char) .. '"'
-end
-
-
-function modules.libraries.json:_encode_number(val)
-  -- Check for NaN, -inf and inf
-  if val ~= val or val <= -math.huge or val >= math.huge then
-    modules.libraries.logging:error("libraries.json","unexpected number value '" .. tostring(val) .. "'")
-  end
-  return string.format("%.14g", val)
-end
-
-
-modules.libraries.json._type_func_map = {
-  [ "nil"     ] = modules.libraries.json._encode_nil,
-  [ "table"   ] = modules.libraries.json._encode_table,
-  [ "string"  ] = modules.libraries.json._encode_string,
-  [ "number"  ] = modules.libraries.json._encode_number,
-  [ "boolean" ] = tostring,
-}
-
-
-function modules.libraries.json:_encode(val, stack)
-  local t = type(val)
-  local f = self._type_func_map[t]
-  if f then
-    return f(val, stack)
-  end
-  modules.libraries.logging:error("libraries.json","unexpected type '" .. t .. "'")
-end
-
-
-function modules.libraries.json:encode(val)
-  return ( self._encode(val) )
-end
-
-
--------------------------------------------------------------------------------
--- Decode
--------------------------------------------------------------------------------
-
-function modules.libraries.json:_create_set(...)
-  local res = {}
-  for i = 1, select("#", ...) do
-    res[ select(i, ...) ] = true
-  end
-  return res
-end
-
-modules.libraries.json._space_chars = modules.libraries.json:_create_set(" ", "\t", "\r", "\n")
-modules.libraries.json._delim_chars = modules.libraries.json:_create_set(" ", "\t", "\r", "\n", "]", "}", ",")
-modules.libraries.json._escape_chars = modules.libraries.json:_create_set("\\", "/", '"', "b", "f", "n", "r", "t", "u")
-modules.libraries.json._literals = modules.libraries.json:_create_set("true", "false", "null")
-
-modules.libraries.json._literal_map = {
-  [ "true"  ] = true,
-  [ "false" ] = false,
-  [ "null"  ] = nil,
-}
-
-
-function modules.libraries.json:_next_char(str, idx, set, negate)
-  for i = idx, #str do
-    if set[str:sub(i, i)] ~= negate then
-      return i
-    end
-  end
-  return #str + 1
-end
-
-
-function modules.libraries.json:_decode_error(str, idx, msg)
-  local line_count = 1
-  local col_count = 1
-  for i = 1, idx - 1 do
-    col_count = col_count + 1
-    if str:sub(i, i) == "\n" then
-      line_count = line_count + 1
-      col_count = 1
-    end
-  end
-  modules.libraries.logging:error("libraries.json", string.format("%s at line %d col %d", msg, line_count, col_count) )
-end
-
-
-function modules.libraries.json:_codepoint_to_utf8(n)
-  -- http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=iws-appendixa
-  local f = math.floor
-  if n <= 0x7f then
-    return string.char(n)
-  elseif n <= 0x7ff then
-    return string.char(f(n / 64) + 192, n % 64 + 128)
-  elseif n <= 0xffff then
-    return string.char(f(n / 4096) + 224, f(n % 4096 / 64) + 128, n % 64 + 128)
-  elseif n <= 0x10ffff then
-    return string.char(f(n / 262144) + 240, f(n % 262144 / 4096) + 128,
-                       f(n % 4096 / 64) + 128, n % 64 + 128)
-  end
-  modules.libraries.logging:error("libraries.json", string.format("invalid unicode codepoint '%x'", n) )
-end
-
-
-function modules.libraries.json:_parse_unicode_escape(s)
-  local n1 = tonumber( s:sub(1, 4),  16 )
-  local n2 = tonumber( s:sub(7, 10), 16 )
-   -- Surrogate pair?
-  if n2 then
-    return self:_codepoint_to_utf8((n1 - 0xd800) * 0x400 + (n2 - 0xdc00) + 0x10000)
-  else
-    return self:codepoint_to_utf8(n1)
-  end
-end
-
-
-function modules.libraries.json:_parse_string(str, i)
-  local res = ""
-  local j = i + 1
-  local k = j
-
-  while j <= #str do
-    local x = str:byte(j)
-
-    if x < 32 then
-      self:_decode_error(str, j, "control character in string")
-
-    elseif x == 92 then -- `\`: Escape
-      res = res .. str:sub(k, j - 1)
-      j = j + 1
-      local c = str:sub(j, j)
-      if c == "u" then
-        local hex = str:match("^[dD][89aAbB]%x%x\\u%x%x%x%x", j + 1)
-                 or str:match("^%x%x%x%x", j + 1)
-                 or self:_decode_error(str, j - 1, "invalid unicode escape in string")
-        res = res .. self:_parse_unicode_escape(hex)
-        j = j + #hex
-      else
-        if not self._escape_chars[c] then
-          self:_decode_error(str, j - 1, "invalid escape char '" .. c .. "' in string")
+    for _ in pairs(obj) do
+        if obj[i] ~= nil then
+            i = i + 1
+        else
+            return "table"
         end
-        res = res .. modules.libraries.json._escape_char_map_inv[c]
-      end
-      k = j + 1
-
-    elseif x == 34 then -- `"`: End of string
-      res = res .. str:sub(k, j - 1)
-      return res, j + 1
     end
 
-    j = j + 1
-  end
-
-  self:_decode_error(str, i, "expected closing quote for string")
-end
-
-
-function modules.libraries.json:_parse_number(str, i)
-  local x = self:_next_char(str, i, self._delim_chars)
-  local s = str:sub(i, x - 1)
-  local n = tonumber(s)
-  if not n then
-    self:_decode_error(str, i, "invalid number '" .. s .. "'")
-  end
-  return n, x
-end
-
-
-function modules.libraries.json:_parse_literal(str, i)
-  local x = self:_next_char(str, i, self._delim_chars)
-  local word = str:sub(i, x - 1)
-  if not self._literals[word] then
-    self:_decode_error(str, i, "invalid literal '" .. word .. "'")
-  end
-  return self._literal_map[word], x
-end
-
-
-function modules.libraries.json:_parse_array(str, i)
-  local res = {}
-  local n = 1
-  i = i + 1
-  while 1 do
-    local x
-    i = self:_next_char(str, i, self._space_chars, true)
-    -- Empty / end of array?
-    if str:sub(i, i) == "]" then
-      i = i + 1
-      break
+    if i == 1 then
+        return "table"
+    else
+        return "array"
     end
-    -- Read token
-    x, i = self:_parse(str, i)
-    res[n] = x
-    n = n + 1
-    -- Next token
-    i = self:_next_char(str, i, self._space_chars, true)
-    local chr = str:sub(i, i)
-    i = i + 1
-    if chr == "]" then break end
-    if chr ~= "," then self:_decode_error(str, i, "expected ']' or ','") end
-  end
-  return res, i
 end
 
+--[[
+    Escapes a string for JSON.<br>
+    Used internally. Do not use in your code.
+]]
+---@param str string
+---@return string
+function modules.libraries.json:escapeString(str)
+    -- Escape the string
+    local inChar  = { "\\", "\"", "/", "\b", "\f", "\n", "\r", "\t" }
+    local outChar = { "\\", "\"", "/", "b", "f", "n", "r", "t" }
 
-function modules.libraries.json:_parse_object(str, i)
-  local res = {}
-  i = i + 1
-  while 1 do
-    local key, val
-    i = self:_next_char(str, i, self._space_chars, true)
-    -- Empty / end of object?
-    if str:sub(i, i) == "}" then
-      i = i + 1
-      break
+    for i, c in ipairs(inChar) do
+        str = str:gsub(c, "\\" .. outChar[i])
     end
-    -- Read key
-    if str:sub(i, i) ~= '"' then
-      self:_decode_error(str, i, "expected string for key")
-    end
-    key, i = self:_parse(str, i)
-    -- Read ':' delimiter
-    i = self:_next_char(str, i, self._space_chars, true)
-    if str:sub(i, i) ~= ":" then
-      self:_decode_error(str, i, "expected ':' after key")
-    end
-    i = self:_next_char(str, i + 1, self._space_chars, true)
-    -- Read value
-    val, i = self:_parse(str, i)
-    -- Set
-    res[key] = val
-    -- Next token
-    i = self:_next_char(str, i, self._space_chars, true)
-    local chr = str:sub(i, i)
-    i = i + 1
-    if chr == "}" then break end
-    if chr ~= "," then self:_decode_error(str, i, "expected '}' or ','") end
-  end
-  return res, i
+
+    return str
 end
 
+---@param str string
+---@param pos integer
+---@param delim string
+---@param errIfMissing boolean|nil
+---@return integer
+---@return boolean
+function modules.libraries.json:skipDelim(str, pos, delim, errIfMissing)
+    -- Main logic
+    pos = pos + #str:match("^%s*", pos)
 
-modules.libraries.json._char_func_map = {
-  [ '"' ] = modules.libraries.json._parse_string,
-  [ "0" ] = modules.libraries.json._parse_number,
-  [ "1" ] = modules.libraries.json._parse_number,
-  [ "2" ] = modules.libraries.json._parse_number,
-  [ "3" ] = modules.libraries.json._parse_number,
-  [ "4" ] = modules.libraries.json._parse_number,
-  [ "5" ] = modules.libraries.json._parse_number,
-  [ "6" ] = modules.libraries.json._parse_number,
-  [ "7" ] = modules.libraries.json._parse_number,
-  [ "8" ] = modules.libraries.json._parse_number,
-  [ "9" ] = modules.libraries.json._parse_number,
-  [ "-" ] = modules.libraries.json._parse_number,
-  [ "t" ] = modules.libraries.json._parse_literal,
-  [ "f" ] = modules.libraries.json._parse_literal,
-  [ "n" ] = modules.libraries.json._parse_literal,
-  [ "[" ] = modules.libraries.json._parse_array,
-  [ "{" ] = modules.libraries.json._parse_object,
-}
+    if str:sub(pos, pos) ~= delim then
+        if errIfMissing then
+            return 0, false
+        end
 
+        return pos, false
+    end
 
-function modules.libraries.json:_parse(str, idx)
-  local chr = str:sub(idx, idx)
-  local f = modules.libraries.json._char_func_map[chr]
-  if f then
-    return f(str, idx)
-  end
-  self:decode_error(str, idx, "unexpected character '" .. chr .. "'")
+    return pos + 1, true
 end
 
+---@param str string
+---@param pos integer
+---@param val string|nil
+---@return string
+---@return integer
+function modules.libraries.json:parseStringValue(str, pos, val)
+    -- Parsing
+    val = val or ""
 
-function modules.libraries.json:decode(str)
-  if type(str) ~= "string" then
-    modules.libraries.logging:error("libraries.json","expected argument of type string, got " .. type(str))
-  end
-  local res, idx = self:_parse(str, self:_next_char(str, 1, self._space_chars, true))
-  idx = self:_next_char(str, idx, self._space_chars, true)
-  if idx <= #str then
-    self:_decode_error(str, idx, "trailing garbage")
-  end
-  return res
+    -- local earlyEndError = "End of input found while parsing string."
+
+    if pos > #str then
+        return "", 0
+    end
+
+    local c = str:sub(pos, pos)
+
+    if c == "\"" then
+        return val, pos + 1
+    end
+
+    if c ~= "\\" then return
+        self:parseStringValue(str, pos + 1, val .. c)
+    end
+
+    local escMap = {b = "\b", f = "\f", n = "\n", r = "\r", t = "\t"}
+    local nextc = str:sub(pos + 1, pos + 1)
+
+    if not nextc then
+        return "", 0
+    end
+
+    return self:parseStringValue(str, pos + 2, val..(escMap[nextc] or nextc))
+end
+
+---@param str string
+---@param pos integer
+---@return integer
+---@return integer
+function modules.libraries.json:parseNumberValue(str, pos)
+    -- Parse number
+    local numStr = str:match("^-?%d+%.?%d*[eE]?[+-]?%d*", pos)
+    local val = tonumber(numStr)
+
+    if not val then
+        return 0, 0
+    end
+
+    return val, pos + #numStr
+end
+
+---@param obj table|number|string|boolean|nil
+---@param asKey boolean|nil
+---@return string
+function modules.libraries.json:encode(obj, asKey)
+    -- Encode the object into a JSON string
+    local s = {}
+    local kind = self:kindOf(obj)
+
+    if kind == "array" then
+        if asKey then
+            return ""
+        end
+
+        s[#s + 1] = "["
+
+        for i, val in ipairs(obj --[[@as table]]) do
+            if i > 1 then
+                s[#s + 1] = ", "
+            end
+
+            s[#s + 1] = self:encode(val)
+        end
+
+        s[#s + 1] = "]"
+    elseif kind == "table" then
+        if asKey then
+            return ""
+        end
+
+        s[#s + 1] = "{"
+
+        for k, v in pairs(obj --[[@as table]]) do
+            if #s > 1 then
+                s[#s + 1] = ", "
+            end
+
+            s[#s + 1] = self:encode(k, true)
+            s[#s + 1] = ":"
+            s[#s + 1] = self:encode(v)
+        end
+
+        s[#s + 1] = "}"
+    elseif kind == "string" then
+        return "\""..self:escapeString(obj --[[@as string]]).."\""
+    elseif kind == "number" then
+        if asKey then
+            return "\"" .. tostring(obj) .. "\""
+        end
+
+        return tostring(obj)
+    elseif kind == "boolean" then
+        return tostring(obj)
+    elseif kind == "nil" then
+        return "null"
+    else
+        return ""
+    end
+
+    return table.concat(s)
+end
+
+modules.libraries.json._Null = {}
+
+---@param str string
+---@param pos integer|nil
+---@param endDelim string|nil
+---@return any
+---@return integer
+function modules.libraries.json:decode(str, pos, endDelim)
+    -- Decode a JSON string into a Lua object
+    pos = pos or 1
+
+    if pos > #str then
+        return nil, 0
+    end
+
+    pos = pos + #str:match("^%s*", pos)
+    local first = str:sub(pos, pos)
+
+    if first == "{" then
+        local obj, key, delimFound = {}, true, true
+        pos = pos + 1
+
+        while true do
+            key, pos = self:decode(str, pos, "}")
+
+            if key == nil then
+                return obj, pos
+            end
+
+            if not delimFound then
+                return nil, 0
+            end
+
+            pos = self:skipDelim(str, pos, ":", true)
+
+            obj[key], pos = self:decode(str, pos)
+            pos, delimFound = self:skipDelim(str, pos, ",")
+        end
+    elseif first == "[" then
+        local arr, val, delimFound = {}, true, true
+        pos = pos + 1
+
+        while true do
+            val, pos = self:decode(str, pos, "]")
+
+            if val == nil then
+                return arr, pos
+            end
+
+            if not delimFound then
+                return nil, 0
+            end
+
+            arr[#arr + 1] = val
+            pos, delimFound = self:skipDelim(str, pos, ",")
+        end
+    elseif first == "\"" then
+        return self:parseStringValue(str, pos + 1)
+    elseif first == "-" or first:match("%d") then
+        return self:parseNumberValue(str, pos)
+    elseif first == endDelim then
+        return nil, pos + 1
+    else
+        local literals = {
+            ["true"] = true,
+            ["false"] = false,
+            ["null"] = self._Null
+        }
+
+        for litStr, litVal in pairs(literals) do
+            local litEnd = pos + #litStr - 1
+
+            if str:sub(pos, litEnd) == litStr then
+                if litVal == self._Null then
+                    return nil, litEnd + 1
+                end
+
+                return litVal, litEnd + 1
+            end
+        end
+
+        return nil, 0
+    end
 end

@@ -94,7 +94,7 @@ modules.onStart:once(function()
 		modules.libraries.logging:info("jsontest", "Encoded JSON: " .. jsonString)
 
 		local decodedTable = modules.libraries.json:decode(jsonString)
-		modules.libraries.logging:info("jsontest", "Decoded Table: " .. tostring(decodedTable))
+		modules.libraries.logging:info("jsontest", "Decoded Table: " .. modules.libraries.table:tostring(decodedTable))
 	end)
 end)
 
