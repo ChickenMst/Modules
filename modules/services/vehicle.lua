@@ -98,7 +98,7 @@ function modules.services.vehicle:startService()
     end)
 end
 
-function modules.services.vehicle:getVehicleGroup(vehicle_id)
+function modules.services.vehicle:getVehicleGroup(vehicle_id, mustBeLoaded)
     local g
     for _, vGroup in pairs(self.loadedVehicles) do
         if vGroup.vehicles[vehicle_id] then

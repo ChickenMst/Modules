@@ -1,11 +1,13 @@
 -- init serveices
 modules.services = {}
 modules.services.created = {} -- table of created services
+modules.services.ordered = {}
 
 ---@param name string
 ---@param description string
 ---@param authors table<string>
 function modules.services:createService(name, description, authors)
+    self.ordered[#self.ordered + 1] = name -- add the service name to the ordered list
     if self.created[name] then
         modules.libraries.logging:error("services:create()", "Attempted to create service '" .. name .. "' that already exists.")
     end
@@ -32,20 +34,20 @@ function modules.services:getService(name)
 end
 
 function modules.services:_initServices()
-    for _, service in pairs(self.created) do
-        service:_init()
+    for _, name in pairs(self.ordered) do
+        self.created[name]:_init()
     end
 end
 
 function modules.services:_startServices()
-    for _, service in pairs(self.created) do
-        service:_start()
+    for _, name in pairs(self.ordered) do
+        self.created[name]:_start()
     end
 end
 
 require "modules.services.addon" -- load the addons service
 require "modules.services.loop" -- load the loops service
 require "modules.services.command" -- load the commands service
-require "modules.services.vehicle" -- load the vehicles service
 require "modules.services.player" -- load the player service
+require "modules.services.vehicle" -- load the vehicles service
 require "modules.services.tps" -- load the TPS service
