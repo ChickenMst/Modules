@@ -41,9 +41,7 @@ function modules.services.vehicle:startService()
     end)
 
     modules.libraries.callbacks:connect("onVehicleLoad", function(vehicle_id)
-        local vdata = server.getVehicleData(vehicle_id)
-
-        local vGroup = self.loadingVehicles[tostring(vdata.group_id)]
+        local vGroup = self:getVehicleGroup(vehicle_id)
         if not vGroup then
             modules.libraries.logging:info("onVehicleLoad", "Vehicle group not found for vehicle id: " .. vehicle_id)
             return
@@ -58,20 +56,18 @@ function modules.services.vehicle:startService()
             end
         end
 
-        if loaded then
+        if loaded and not vGroup.isLoaded then
             modules.libraries.logging:debug("onVehicleLoad", "Vehicle group loaded with id: " .. vGroup.group_id)
             vGroup:loaded()
-            self.loadedVehicles[tostring(vdata.group_id)] = vGroup
-            self.loadingVehicles[tostring(vdata.group_id)] = nil
+            self.loadedVehicles[tostring(vGroup.group_id)] = vGroup
+            self.loadingVehicles[tostring(vGroup.group_id)] = nil
             self.onGroupload:fire(vGroup)
             self:_save()
         end
     end)
 
     modules.libraries.callbacks:connect("onVehicleDespawn", function(vehicle_id, peer_id)
-        local vdata = server.getVehicleData(vehicle_id)
-
-        local vGroup = self.loadedVehicles[tostring(vdata.group_id)]
+        local vGroup = self:getVehicleGroup(vehicle_id)
         if not vGroup then
             modules.libraries.logging:info("onVehicleDespawn()", "Vehicle group not found for vehicle id: " .. vehicle_id)
             return
@@ -83,7 +79,6 @@ function modules.services.vehicle:startService()
             end
             vGroup.vehicles[vehicle_id]:despawned()
             self.onVehicleDespawn:fire(vGroup, vehicle_id)
-            vGroup.vehicles[vehicle_id] = nil
         end
 
         local despawned = true
@@ -97,10 +92,27 @@ function modules.services.vehicle:startService()
             modules.libraries.logging:debug("onVehicleDespawn", "Vehicle group despawned with id: " .. vGroup.group_id)
             vGroup:despawned()
             self.onGroupDespawn:fire(vGroup)
-            self.loadedVehicles[tostring(vdata.group_id)] = nil
+            self.loadedVehicles[vGroup.group_id] = nil
             self:_save()
         end
     end)
+end
+
+function modules.services.vehicle:getVehicleGroup(vehicle_id)
+    local g
+    for _, vGroup in pairs(self.loadedVehicles) do
+        if vGroup.vehicles[vehicle_id] then
+            g = vGroup
+        end
+    end
+    if not g then
+        for _, vGroup in pairs(self.loadingVehicles) do
+            if vGroup.vehicles[vehicle_id] then
+                g = vGroup
+            end
+        end
+    end
+    return g
 end
 
 function modules.services.vehicle:_save()
