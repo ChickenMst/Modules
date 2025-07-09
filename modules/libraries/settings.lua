@@ -1,5 +1,5 @@
 modules.libraries.settings = {}
--- this doesnt have any loggine because the logging lib requires the settings lib meaning that its either logging cant use settings or settings cant use logging
+-- this doesnt have any logging because the logging lib requires the settings lib meaning that its either logging cant use settings or settings cant use logging
 
 modules.libraries.settings._settings = require "settings"
 
