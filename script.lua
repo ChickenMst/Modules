@@ -96,6 +96,18 @@ modules.onStart:once(function()
 		local decodedTable = modules.libraries.json:decode(jsonString)
 		modules.libraries.logging:info("jsontest", "Decoded Table: " .. modules.libraries.table:tostring(decodedTable))
 	end)
+
+	modules.services.command:create("settings", {}, "test settings library", function(player, full_message, command, args)
+		local testSetting = modules.libraries.settings:create("test_setting", "test_value", "default_value")
+		modules.libraries.logging:info("settings", "Created setting: " .. modules.libraries.table:tostring(testSetting))
+
+		local value = modules.libraries.settings:get("test_setting", "default_value")
+		modules.libraries.logging:info("settings", "Retrieved setting value: " .. tostring(value))
+
+		modules.libraries.settings:setValue("test_setting", "new_value")
+		value = modules.libraries.settings:getSetting("test_setting", "default_value")
+		modules.libraries.logging:info("settings", "Updated setting value: " .. tostring(value))
+	end)
 end)
 
 modules.onStart:once(function()

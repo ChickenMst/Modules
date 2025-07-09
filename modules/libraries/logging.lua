@@ -9,11 +9,11 @@ modules.libraries.logging.logtypes = {
     ERROR = 4,
 } -- table of log types
 
-modules.libraries.logging.loglevel = modules.libraries.logging.logtypes.DEBUG -- set the default log level to ERROR
+modules.libraries.logging.loglevel = modules.libraries.settings:getValue("logginglevel",true,4) -- set the default log level to ERROR
 
-modules.libraries.logging.loggingdetail = "minimal" -- the logging detail, can be "full" or "minimal"
+modules.libraries.logging.loggingdetail = modules.libraries.settings:getValue("loggingdetail",true,"minimal") -- the logging detail, can be "full" or "minimal"
 
-modules.libraries.logging.loggingmode = "chat" -- set the default log mode to console
+modules.libraries.logging.loggingmode = modules.libraries.settings:getValue("loggingmode",true,"chat") -- set the default log mode to console
 
 ---@param logtype number
 ---@param title string
@@ -79,6 +79,7 @@ function modules.libraries.logging:setLogLevel(state)
     end
     if self.logtypes[state] then
         self.loglevel = self.logtypes[state] -- set the log level to the state
+        modules.libraries.settings:setValue("logginglevel", self.loglevel) -- set the log level in the settings
         self:info("libraries.logging", "Log level set to " .. state) -- print the log level to the console
     else
         self:error("libraries.logging", "Invalid log level: " .. state)
