@@ -101,7 +101,7 @@ modules.onStart:once(function()
 		local testSetting = modules.libraries.settings:create("test_setting", "test_value", "default_value")
 		modules.libraries.logging:info("settings", "Created setting: " .. modules.libraries.table:tostring(testSetting))
 
-		local value = modules.libraries.settings:get("test_setting", "default_value")
+		local value = modules.libraries.settings:getValue("test_setting",true,"default_value")
 		modules.libraries.logging:info("settings", "Retrieved setting value: " .. tostring(value))
 
 		modules.libraries.settings:setValue("test_setting", "new_value")
