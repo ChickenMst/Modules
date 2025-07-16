@@ -14,6 +14,7 @@ function modules.classes.loop:create(time, func, id)
 		paused = false
     }
 
+    -- set the loop into a paused state
     function loop:setPaused(state)
         self.paused = state
     end

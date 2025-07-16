@@ -1,6 +1,10 @@
 modules.libraries.table = {}
 
 -- https://github.com/cuhHub/Noir/blob/v2.0.0/src/Noir/Built-Ins/Libraries/Table.lua
+-- Converts a table to a string representation with indentation.
+---@param tbl table The table to convert.
+---@param indent number|nil The current indentation level (default is 0).
+---@return string -- The string representation of the table.
 function modules.libraries.table:tostring(tbl, indent)
     -- Set default indent
     if not indent then

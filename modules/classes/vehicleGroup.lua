@@ -17,19 +17,25 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded)
         isLoaded = loaded or false,
     }
 
-    function vehicleGroup:despawned(is_instant)
+    -- fires the onDespawn event
+    function vehicleGroup:despawned()
         self.onDespawn:fire(self)
     end
 
+    -- sets the vehicle group as loaded and fires the onLoaded event
     function vehicleGroup:loaded()
         self.isLoaded = true
         self.onLoaded:fire(self)
     end
 
+    -- sets the vehicle groups owner
+    ---@param newowner Player
     function vehicleGroup:setOwner(newowner)
         self.owner = newowner
     end
 
+    -- adds a vehicle to the vehicle group
+    ---@param vehicle Vehicle
     function vehicleGroup:addVehicle(vehicle)
         if not self.vehicles[vehicle.id] then
             self.vehicles[vehicle.id] = vehicle

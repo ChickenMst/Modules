@@ -15,11 +15,13 @@ function modules.classes.vehicle:create(vehicleId, groupId, loaded)
         isDespawned = false
     }
 
-    function vehicle:despawned(is_instant)
+    -- sets the vehicles isDespawned state to true and fires the onDespawn event
+    function vehicle:despawned()
         self.isDespawned = true
         self.onDespawn:fire(self)
     end
 
+    -- sets the vehicles isLoaded state to true and fires the onLoaded event
     function vehicle:loaded()
         self.onLoaded:fire(self)
         self.isLoaded = true

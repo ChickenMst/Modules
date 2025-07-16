@@ -70,6 +70,8 @@ function modules.libraries.logging:_logLevelToString(loglevel)
     end
 end
 
+-- set the log level to the inputed state
+---@param state string
 function modules.libraries.logging:setLogLevel(state)
     if state then
         state = state:upper() -- make the state lowercase

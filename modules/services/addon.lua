@@ -10,7 +10,11 @@ function modules.services.addon:startService()
     self:_loadAddons() -- load the addons
 end
 
+-- create a new addon with the inputed name, version, description and authors
 ---@param name string
+---@param version string|number
+---@param description string
+---@param authors table<string>
 ---@return Addon
 function modules.services.addon:createAddon(name, version, description, authors)
     if self.addons[name] then
@@ -24,7 +28,8 @@ function modules.services.addon:createAddon(name, version, description, authors)
     return addon -- return the addon instance
 end
 
----@param name string
+-- remove the addon with the inputed name from the addons table, if it exists
+---@param name string name of the addon to remove
 function modules.services.addon:disconnect(name)
     if self.addons[name] then
         self.addons[name]:disable()
@@ -35,6 +40,7 @@ function modules.services.addon:disconnect(name)
     end
 end
 
+-- enable the addon with the inputed name, if it exists and is not already enabled
 ---@param name string
 function modules.services.addon:enable(name)
     if self.addons[name] then
@@ -52,6 +58,7 @@ function modules.services.addon:enable(name)
     end
 end
 
+-- disable the addon with the inputed name, if it exists and is not already disabled
 ---@param name string
 function modules.services.addon:disable(name)
     if self.addons[name] then
@@ -67,6 +74,7 @@ function modules.services.addon:disable(name)
     end
 end
 
+-- internal function to load all addons in the addons table
 function modules.services.addon:_loadAddons()
     for name, addon in pairs(self.addons) do
         modules.libraries.logging:debug("services.addon", "Loading addon: "..name)

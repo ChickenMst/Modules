@@ -25,14 +25,23 @@ function modules.services.tps:startService()
     end)
 end
 
+-- internal function to calculate the TPS (ticks per second)
+---@param last number last tick time in milliseconds
+---@param now number current tick time in milliseconds
+---@param ticks number number of ticks since the last tick
+---@return number TPS (ticks per second)
 function modules.services.tps:_calculateTPS(last, now, ticks)
     return 1000 / (now - last) * ticks
 end
 
+-- get the current TPS (ticks per second)
+---@return number TPS (ticks per second)
 function modules.services.tps:getTPS()
     return self.tps
 end
 
+-- set the target for the TPS limiting
+---@param targetTPS number
 function modules.services.tps:setTPS(targetTPS)
     if targetTPS < 0 then
         targetTPS = 0 -- disable TPS limiting if targetTPS is negative

@@ -3,6 +3,7 @@ modules.services = {}
 modules.services.created = {} -- table of created services
 modules.services.ordered = {}
 
+-- create a new service with the inputed name, description and authors
 ---@param name string
 ---@param description string
 ---@param authors table<string>
@@ -19,6 +20,9 @@ function modules.services:createService(name, description, authors)
     return service -- return the created service
 end
 
+-- get the service with the inputed name
+---@param name string
+---@return Service
 function modules.services:getService(name)
     local service = self.created[name] -- get the service by name
 
@@ -33,12 +37,14 @@ function modules.services:getService(name)
     return service -- return the service
 end
 
+-- internal function to initialize all services
 function modules.services:_initServices()
     for _, name in pairs(self.ordered) do
         self.created[name]:_init()
     end
 end
 
+-- internal function to start all services
 function modules.services:_startServices()
     for _, name in pairs(self.ordered) do
         self.created[name]:_start()

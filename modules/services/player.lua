@@ -55,6 +55,7 @@ function modules.services.player:startService()
     end)
 end
 
+-- get a player by their steam_id
 ---@param steam_id string
 ---@return Player|nil
 function modules.services.player:getPlayer(steam_id)
@@ -70,6 +71,7 @@ function modules.services.player:getPlayer(steam_id)
     modules.libraries.logging:info("services.player:getPlayer", "Player not found with steam_id: " .. steam_id)
 end
 
+-- get a player by their peer_id
 ---@param peer_id number
 ---@return Player|nil
 function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to use this function, but it is here for compatibility
@@ -84,11 +86,13 @@ function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to 
     end
 end
 
+-- get all players
 ---@return table<string, Player>
 function modules.services.player:getPlayers()
     return self.players -- return the list of players
 end
 
+-- get all online players
 ---@return table<string, Player>
 function modules.services.player:getOnlinePlayers() -- returns a table of players that are currently in-game
     local onlinePlayers = {}
@@ -100,6 +104,7 @@ function modules.services.player:getOnlinePlayers() -- returns a table of player
     return onlinePlayers -- return the list of online players
 end
 
+-- internal function to load the players from gsave
 function modules.services.player:_load()
     local service = modules.libraries.gsave:loadService("player")
 
@@ -161,10 +166,12 @@ function modules.services.player:_load()
     modules.services.player:_save() -- save the player service after loading
 end
 
+-- internal function to save the players to gsave
 function modules.services.player:_save()
     modules.libraries.gsave:saveService("player", self)
 end
 
+-- internal function to verify if the players are online
 function modules.services.player:_verifyOnlinePlayers()
     local onlinePlayers = {}
 
@@ -180,6 +187,7 @@ function modules.services.player:_verifyOnlinePlayers()
     end
 end
 
+-- internal function to clean the player name of any characters that break chat
 function modules.services.player:_cleanName(name)
     return string.gsub(name, "[<]", "")
 end

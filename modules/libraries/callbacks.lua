@@ -2,8 +2,8 @@ modules.libraries.callbacks = {} -- table of callback functions
 
 modules.libraries.callbacks.events = {} -- table of events
 
----@param name string
----@param callback function
+---@param name string the name of the callback you want to connect to
+---@param callback function the function to be called when the event is fired
 ---@return EventConnection
 ---@overload fun(self, name: "onClearOilSpill", callback: fun())
 ---@overload fun(self, name: "onTick", callback: fun(game_ticks: number))
@@ -53,8 +53,8 @@ function modules.libraries.callbacks:connect(name, callback)
     return event:connect(callback) -- connect the callback to the event
 end
 
----@param name string
----@param callback function
+---@param name string the name of the callback you want to connect to
+---@param callback function the function to be called when the event is fired
 ---@return EventConnection
 ---@overload fun(self, name: "onClearOilSpill", callback: fun())
 ---@overload fun(self, name: "onTick", callback: fun(game_ticks: number))
@@ -104,6 +104,7 @@ function modules.libraries.callbacks:once(name, callback)
     return event:once(callback) -- connect the callback to the event
 end
 
+-- internal function to initialize a callback. do not call this directly.
 ---@param name string
 ---@return Event
 function modules.libraries.callbacks:_initCallback(name)

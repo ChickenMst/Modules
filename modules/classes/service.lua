@@ -17,6 +17,7 @@ function modules.classes.service:create(name, description, authors)
         hasStarted = false
     }
 
+    -- initializes the service, runs the init function of the service
     function service:_init()
         if self.hasInit then
             modules.libraries.logging:warning("service:_init()", "Service '" .. self.name .. "' is already initialized.")
@@ -33,6 +34,7 @@ function modules.classes.service:create(name, description, authors)
         self:initService()
     end
 
+    -- starts the service, runs the start function of the service
     function service:_start()
         if self.hasStarted then
             modules.libraries.logging:warning("service:_start()", "Attempted to start service '" .. self.name .. "' that is already started.")

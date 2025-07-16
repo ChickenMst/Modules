@@ -98,6 +98,9 @@ function modules.services.vehicle:startService()
     end)
 end
 
+--- get a vehicle group by its vehicle id
+---@param vehicle_id number
+---@param mustBeLoaded boolean|nil
 function modules.services.vehicle:getVehicleGroup(vehicle_id, mustBeLoaded)
     local g
     for _, vGroup in pairs(self.loadedVehicles) do
@@ -105,7 +108,7 @@ function modules.services.vehicle:getVehicleGroup(vehicle_id, mustBeLoaded)
             g = vGroup
         end
     end
-    if not g then
+    if not g and not mustBeLoaded then
         for _, vGroup in pairs(self.loadingVehicles) do
             if vGroup.vehicles[vehicle_id] then
                 g = vGroup
@@ -115,10 +118,12 @@ function modules.services.vehicle:getVehicleGroup(vehicle_id, mustBeLoaded)
     return g
 end
 
+-- internal function to save the vehicles service
 function modules.services.vehicle:_save()
     modules.libraries.gsave:saveService("vehicles", self)
 end
 
+-- internal function to load the saved vehicles from gsave
 function modules.services.vehicle:_load()
     local service = modules.libraries.gsave:loadService("vehicles")
 

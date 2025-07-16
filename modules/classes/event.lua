@@ -13,6 +13,7 @@ function modules.classes.event:create()
         hasFiredOnce = false,
     }
 
+    -- connects a callback to the event, creates a new connection and adds it to the connections table
     ---@param callback function
     ---@return EventConnection
     function event:connect(callback)
@@ -35,6 +36,7 @@ function modules.classes.event:create()
         return connection
     end
 
+    -- finalizes the connection by adding it to the connectionsOrder and setting its index
     ---@param connection EventConnection
     function event:_connectionFinalize(connection)
         table.insert(self.connectionsOrder, connection.id)
@@ -43,6 +45,7 @@ function modules.classes.event:create()
         connection.connected = true
     end
 
+    -- disconnects the connection after it has been fired once
     ---@param callback function
     ---@return EventConnection
     function event:once(callback)
@@ -56,6 +59,7 @@ function modules.classes.event:create()
         return connection
     end
 
+    -- disconnects the connection, if it is currently firing, it will be added to the connectionsToRemove table to be removed after firing
     ---@param connection EventConnection
     function event:disconnect(connection)
         if self.isFireing then
@@ -65,6 +69,7 @@ function modules.classes.event:create()
         end
     end
 
+    -- disconnects the connection immediately, removes it from the connections table and updates the connectionsOrder
     ---@param connection EventConnection
     function event:_disconnectImidiate(connection)
         self.connections[connection.id] = nil
@@ -74,13 +79,14 @@ function modules.classes.event:create()
             local _connection = self.connections[self.connectionsOrder[i]]
             _connection.index = _connection.index - 1
         end
-        
+
         connection.connected = false
         connection.parentEvent = nil
         connection.id = nil
         connection.index = nil
     end
 
+    -- fires the event, iterates through all connections and calls their fire method
     function event:fire(...)
         self.isFireing = true
 

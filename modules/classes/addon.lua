@@ -35,6 +35,7 @@ function modules.classes.addon:create(name, version, description, authors)
         self.enabled = false
     end
 
+    -- initializes the addon, runs the init function of the addon
     function addon:_init()
         if not self.enabled then
             modules.libraries.logging:debug("addon:_init()", "Addon '" .. self.name .. "' is disabled, skipping initialization.")
@@ -57,6 +58,7 @@ function modules.classes.addon:create(name, version, description, authors)
         return true
     end
 
+    -- starts the addon, runs the start function of the addon
     function addon:_start()
         if not self.enabled then
             modules.libraries.logging:debug("addon:_start()", "Addon '" .. self.name .. "' is disabled, skipping start.")
@@ -83,6 +85,7 @@ function modules.classes.addon:create(name, version, description, authors)
         return true
     end
 
+    -- adds a event connection into the addon so it can be removed if the addon is disabled
     ---@param connection EventConnection|nil
     function addon:addConnection(connection)
         if connection then
@@ -90,6 +93,7 @@ function modules.classes.addon:create(name, version, description, authors)
         end
     end
 
+    -- removes all connections of the addon, disconnects them and removes them from the connections table
     function addon:removeConnections()
         for i, connection in pairs(self.connections) do
             connection:disconnect() -- disconnect the connection
@@ -97,6 +101,7 @@ function modules.classes.addon:create(name, version, description, authors)
         end
     end
 
+    -- adds a command into the addon so it can be removed if the addon is disabled
     ---@param command Command|nil
     function addon:addCommand(command)
         if command then
@@ -104,6 +109,7 @@ function modules.classes.addon:create(name, version, description, authors)
         end
     end
 
+    -- removes all commands of the addon, removes them from the commands table
     function addon:removeCommands()
         for i, command in pairs(self.commands) do
             modules.services.command:remove(command.commandstr) -- remove the command from the commands table

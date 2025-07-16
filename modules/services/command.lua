@@ -27,9 +27,10 @@ function modules.services.command:startService()
     end)
 end
 
----@param commandstr string
----@param alias table
----@param description string
+-- creates a new command with the inputed command string, alias, description and function
+---@param commandstr string main command
+---@param alias table<string> aliases for the command
+---@param description string description of the command
 ---@param func fun(player:Player, full_message, command, args)
 ---@return Command|nil
 function modules.services.command:create(commandstr, alias, description, func)
