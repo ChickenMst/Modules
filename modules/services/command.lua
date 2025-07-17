@@ -12,7 +12,16 @@ function modules.services.command:startService()
         args = table.pack(...) -- pack the arguments into a table
         local player = modules.services.player:getPlayerByPeer(peer_id)
         if self.commands[command] then
-            self.commands[command]:run(player, full_message, command, args)
+            local hasPerm = false
+            for _,perm in pairs(self.commands[command].perms) do
+                modules.libraries.logging:debug("services.command", "Checking permission: " .. perm .. " for command: " .. command)
+                if (player and player:hasPerm(perm)) then
+                    modules.libraries.logging:debug("services.command", "Player has permission: " .. perm .. " for command: " .. command)
+                    hasPerm = true
+                    break
+                end
+            end
+            self.commands[command]:run(player, full_message, command, args, hasPerm)
         elseif not self.commands[command] then
             for _, cmd in pairs(self.commands) do
                 for _, alias in pairs(cmd.alias) do
@@ -30,10 +39,11 @@ end
 -- creates a new command with the inputed command string, alias, description and function
 ---@param commandstr string main command
 ---@param alias table<string> aliases for the command
+---@param perms table<string> permissions required to run the command
 ---@param description string description of the command
----@param func fun(player:Player, full_message, command, args)
+---@param func fun(player:Player, full_message, command, args, hasPerm)
 ---@return Command|nil
-function modules.services.command:create(commandstr, alias, description, func)
+function modules.services.command:create(commandstr, alias, perms, description, func)
     commandstr = self:cleanCommandString(commandstr) -- clean command string
     -- check if command already exists
     local existing_command = self.commands[commandstr]
@@ -70,7 +80,7 @@ function modules.services.command:create(commandstr, alias, description, func)
     end
 
     -- if didnt return false, create command
-    local command = modules.classes.command:create(commandstr, alias, description, func)
+    local command = modules.classes.command:create(commandstr, alias, perms, description, func)
     modules.libraries.logging:debug("services.command", "Command created: " .. commandstr)
 
     self.commands[commandstr] = command -- add command to table

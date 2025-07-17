@@ -5,11 +5,12 @@ modules.classes.command = {} -- table of command functions
 ---@param description string
 ---@param func function
 ---@return Command
-function modules.classes.command:create(commandstr, alias, description, func)
+function modules.classes.command:create(commandstr, alias, perms, description, func)
     ---@class Command
     local command = {
         commandstr = commandstr,
         alias = alias,
+        perms = perms,
         description = description,
         func = func,
         enabled = true,

@@ -11,11 +11,11 @@ modules.onServiceInit:connect(function()
             end
         end))
 
-        self:addCommand(modules.services.command:create("e", {"ee"}, "e", function(player, full_message, command, args)
+        self:addCommand(modules.services.command:create("e", {"ee"}, {}, "e", function(player, full_message, command, args)
             modules.libraries.logging:info("e()", "Player: " .. player.peerId .. " sent a command: " .. command)
         end))
 
-        self:addCommand(modules.services.command:create("d", {"disable"}, "disable e addon", function(player, full_message, command, args)
+        self:addCommand(modules.services.command:create("d", {"disable"}, {}, "disable e addon", function(player, full_message, command, args)
             modules.libraries.logging:info("disable()", "disableing self")
             modules.services.addon:disable(self.name)
         end))
