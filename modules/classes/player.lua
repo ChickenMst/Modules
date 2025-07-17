@@ -77,8 +77,13 @@ function modules.classes.player:create(peerId, steamId, name, admin, auth, perms
 
     -- checks if the player has a specific permission
     ---@param perm string
-    function player:hasPerm(perm)
-        return self.perms[perm] ~= nil
+    ---@param valueToMatch any|nil
+    ---@return boolean
+    function player:hasPerm(perm, valueToMatch)
+        if not valueToMatch then
+            return self.perms[perm] ~= nil
+        end
+        return self.perms[perm] == valueToMatch
     end
 
     -- returns the players permissions table
