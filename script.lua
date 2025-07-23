@@ -66,6 +66,7 @@ modules.onStart:once(function()
 		end
 		local addonName = args[1]
 		modules.services.addon:enable(addonName)
+		
 	end)
 
 	modules.services.command:create("disableaddon", {}, {}, "disable an addon", function(player, full_message, command, args, hasPerm)
