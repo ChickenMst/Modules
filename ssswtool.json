@@ -1,5 +1,5 @@
 {
-	"name": "SSSWToolTest",
+	"name": "HttpTest",
 	"entrypoint": "script.lua",
 	"src": ["."],
 	"out": "{SW_SAVE}/data/missions/{NAME}/script.lua",
