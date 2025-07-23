@@ -1,98 +1,28 @@
 require "modules"
 
+counter = 0
+
+requests = {}
+replys = {}
+
 modules.onStart:once(function()
-	modules.services.command:create("pinfo",{},{},"",function(player, full_message, command, args, hasPerm)
-		modules.libraries.logging:debug("pinfo", "Command executed by peer_id: " .. tostring(player.peerId))
-		if #args ~= 0 then
-			local pid = tonumber(args[1])
-			player = modules.services.player:getPlayerByPeer((pid and pid or -1))
-		end
-		modules.libraries.logging:info("pinfo", "Player info: " .. (player and player.steamId or "Nil") .. ", " .. (player and player.name or "Nil") .. ", " .. (player and tostring(player.inGame) or "Nil"))
+	modules.services.command:create("httptest",{"ht"},{},"test http",function (player, full_message, command, args, hasPerm)
+		counter = counter + 1
+		local requestTbl = {
+			num=counter,
+			action="send",
+			args=args
+		}
+		local request = modules.libraries.json:encode(requestTbl)
+		server.httpGet(800,request)
+		requests[counter] = requestTbl
 	end)
+end)
 
-	modules.services.command:create("loglevel",{"ll"}, {}, "set the log level", function(player, full_message, command, args, hasPerm)
-		if #args == 0 then
-			modules.libraries.logging:warning("loglevel", "No log level provided")
-			return
-		end
-		local loglevel = args[1]:upper()
-		modules.libraries.logging:setLogLevel(loglevel)
-	end)
-
-	modules.services.command:create("purge",{}, {},"purge gsave data",function(player, full_message, command, args, hasPerm)
-		modules.libraries.gsave:_purgeGsave()
-	end)
-
-	modules.services.command:create("simjoin",{}, {},"simulate a join",function(player, full_message, command, args, hasPerm)
-		onPlayerJoin(1234567890, "Test<Player", 10, false, false)
-	end)
-
-	modules.services.command:create("simleave", {}, {}, "simulate a leave", function(player, full_message, command, args, hasPerm)
-		onPlayerLeave(1234567890, "Test<Player", 10, false, false)
-	end)
-
-	modules.services.command:create("players", {}, {}, "get all players", function(player, full_message, command, args, hasPerm)
-		local players = modules.services.player:getOnlinePlayers()
-		local str = "Online Players:\n"
-		for _, player in pairs(players) do
-			str = str .. "SteamID: " .. player.steamId .. ", Name: " .. player.name .. ", PeerID: " .. player.peerId .. "\n"
-		end
-		modules.libraries.logging:info("players", str)
-	end)
-
-	modules.services.command:create("gettps", {}, {}, "get tps", function(player, full_message, command, args, hasPerm)
-		local tps = modules.services.tps:getTPS()
-		modules.libraries.logging:info("tps", "Current TPS: " .. (tostring(tps) or "Nil"))
-	end)
-
-	modules.services.command:create("settps", {}, {}, "set tps", function(player, full_message, command, args, hasPerm)
-		if #args == 0 then
-			modules.libraries.logging:warning("settps", "No target TPS provided")
-			return
-		end
-		local targetTPS = tonumber(args[1])
-		if not targetTPS then
-			modules.libraries.logging:warning("settps", "Invalid target TPS provided")
-			return
-		end
-		modules.services.tps:setTPS(targetTPS)
-		modules.libraries.logging:info("settps", "Target TPS set to: " .. tostring(targetTPS))
-	end)
-
-	modules.services.command:create("enableaddon", {}, {}, "get all addons", function(player, full_message, command, args, hasPerm)
-		if #args == 0 then
-			modules.libraries.logging:warning("enableaddon", "No addon name provided")
-			return
-		end
-		local addonName = args[1]
-		modules.services.addon:enable(addonName)
-	end)
-
-	modules.services.command:create("disableaddon", {}, {}, "disable an addon", function(player, full_message, command, args, hasPerm)
-		if #args == 0 then
-			modules.libraries.logging:warning("disableaddon", "No addon name provided")
-			return
-		end
-		local addonName = args[1]
-		modules.services.addon:disable(addonName)
-	end)
-
-	modules.services.command:create("loadaddons", {}, {}, "load all addons", function(player, full_message, command, args, hasPerm)
-		modules.services.addon:_loadAddons()
-	end)
-
-	modules.services.command:create("permcheck",{},{"perm"}, "check if player has permission", function(player, full_message, command, args, hasPerm)
-		if not hasPerm then
-			modules.libraries.logging:warning("permcheck", "Player does not have permission to run this command")
-			return
-		end
-	end)
-
-	modules.services.command:create("permset",{},{},"set permission for player", function(player, full_message, command, args, hasPerm)
-		local perm = args[1]
-		player:setPerm(perm, true)
-		modules.libraries.logging:info("permset", "Permission " .. perm .. " set for player " .. player.name)
-	end)
+modules.libraries.callbacks:connect("httpReply", function(port, request, reply)
+	request = modules.libraries.json:decode(request)
+	local foundrequest = requests[request.num]
+	replys[request.num] = reply
 end)
 
 modules.onStart:once(function()
