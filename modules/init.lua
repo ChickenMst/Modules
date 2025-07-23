@@ -47,6 +47,9 @@ modules.libraries.callbacks:once("onCreate", function(is_world_create)
 
             modules.services:_startServices() -- start all services
 
+            local startUpTook = server.getTimeMillisec() - startTime
+            modules.libraries.logging:debug("onStart", "Took: "..tostring(startUpTook).."ms to start modules")
+
             modules.libraries.logging:debug("onStart", "modules started. fireing onStart event")
             modules.onStart:fire()
         end)
