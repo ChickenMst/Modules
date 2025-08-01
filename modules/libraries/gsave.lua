@@ -4,7 +4,7 @@ modules.libraries.gsave = {}
 ---@param name string name of the service
 ---@param service any the service to save
 function modules.libraries.gsave:saveService(name, service)
-    local localservice = service
+    local localservice = self:_strip(service)
     self:_checkGsave(name)
 
     g_savedata.modules.services[name] = localservice
@@ -66,4 +66,25 @@ function modules.libraries.gsave:_purgeGsave()
     g_savedata = nil
     self:_fixGsave()
     modules.libraries.logging:info("gsave:_purgeGsave", "GSave data purged and reset.")
+end
+
+-- internal function to strip functions from a table
+---@param tbl table the table to strip
+---@return table -- a new table with functions removed
+function modules.libraries.gsave:_strip(tbl)
+    local stripped = {}
+    for k, v in pairs(tbl) do
+        if type(v) == "function" then
+            goto continue
+        end
+
+        if type(v) == "table" then
+            stripped[k] = self:_strip(v)
+        else
+            stripped[k] = v
+        end
+
+        ::continue::
+    end
+    return stripped
 end
