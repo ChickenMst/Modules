@@ -52,3 +52,21 @@ function modules.libraries.table:tostring(tbl, indent)
     -- Return the table as a formatted string
     return table.concat(toConcatenate, "\n")
 end
+
+function modules.libraries.table:strip(tbl, typeOf)
+    local stripped = {}
+    for k, v in pairs(tbl) do
+        if type(v) == typeOf then
+            goto continue
+        end
+
+        if type(v) == "table" then
+            stripped[k] = self:strip(v, typeOf)
+        else
+            stripped[k] = v
+        end
+
+        ::continue::
+    end
+    return stripped
+end

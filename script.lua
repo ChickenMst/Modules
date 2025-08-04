@@ -66,7 +66,6 @@ modules.onStart:once(function()
 		end
 		local addonName = args[1]
 		modules.services.addon:enable(addonName)
-		
 	end)
 
 	modules.services.command:create("disableaddon", {}, {}, "disable an addon", function(player, full_message, command, args, hasPerm)
@@ -93,6 +92,16 @@ modules.onStart:once(function()
 		local perm = args[1]
 		player:setPerm(perm, true)
 		modules.libraries.logging:info("permset", "Permission " .. perm .. " set for player " .. player.name)
+	end)
+
+	modules.services.command:create("httptest", {}, {}, "test HTTP service", function(player, full_message, command, args, hasPerm)
+		modules.services.http:get(8080, "http://localhost:8080/", function(request, reply)
+			if reply then
+				modules.libraries.logging:info("httptest", "Received reply: " .. reply)
+			else
+				modules.libraries.logging:error("httptest", "No reply received")
+			end
+		end)
 	end)
 end)
 
