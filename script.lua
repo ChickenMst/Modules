@@ -103,6 +103,10 @@ modules.onStart:once(function()
 			end
 		end)
 	end)
+
+	modules.services.command:create("httpget", {}, {}, "test HTTP GET request", function(player, full_message, command, args, hasPerm)
+		server.httpGet(8080, "/api/http/get?request={\"request\":\"http://localhost:8080/api/server/30/?action=kill\",\"id\":1,\"port\":8080}")
+	end)
 end)
 
 modules.onStart:once(function()
