@@ -95,17 +95,13 @@ modules.onStart:once(function()
 	end)
 
 	modules.services.command:create("httptest", {}, {}, "test HTTP service", function(player, full_message, command, args, hasPerm)
-		modules.services.http:get(8080, "http://localhost:8080/", function(request, reply)
+		modules.services.http:get(8080, "http://localhost:8080/api/server/30/?action=kill", function(request, reply)
 			if reply then
 				modules.libraries.logging:info("httptest", "Received reply: " .. reply)
 			else
 				modules.libraries.logging:error("httptest", "No reply received")
 			end
 		end)
-	end)
-
-	modules.services.command:create("httpget", {}, {}, "test HTTP GET request", function(player, full_message, command, args, hasPerm)
-		server.httpGet(8080, "/api/http/get?request={\"request\":\"http://localhost:8080/api/server/30/?action=kill\",\"id\":1,\"port\":8080}")
 	end)
 end)
 

@@ -10,3 +10,4 @@ require "modules.classes.vehicle" -- load the callback classes
 require "modules.classes.vehicleGroup" -- load the vehicle group class
 require "modules.classes.player" -- load the player class
 require "modules.classes.httpRequest" -- load the HTTP request class
+require "modules.classes.widgets" -- load the UI classes
