@@ -58,3 +58,4 @@ require "modules.services.command" -- load the commands service
 require "modules.services.player" -- load the player service
 require "modules.services.vehicle" -- load the vehicles service
 require "modules.services.tps" -- load the TPS service
+require "modules.services.ui" -- load the UI service

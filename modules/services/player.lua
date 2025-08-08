@@ -104,6 +104,17 @@ function modules.services.player:getOnlinePlayers() -- returns a table of player
     return onlinePlayers -- return the list of online players
 end
 
+-- check if two players are the same
+---@param player1 Player
+---@param player2 Player
+---@return boolean
+function modules.services.player:isSamePlayer(player1, player2)
+    if not player1 or not player2 then
+        return false -- return false if either player is nil
+    end
+    return player1.steamId == player2.steamId -- compare the steam_ids of the players
+end
+
 -- internal function to load the players from gsave
 function modules.services.player:_load()
     local service = modules.libraries.gsave:loadService("player")

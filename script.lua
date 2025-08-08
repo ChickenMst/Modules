@@ -103,6 +103,10 @@ modules.onStart:once(function()
 			end
 		end)
 	end)
+
+	modules.services.player.onJoin:connect(function(player)
+		modules.services.ui:createPopupScreen("Welcome to the server!", 0, 0, true, player)
+	end)
 end)
 
 modules.onStart:once(function()

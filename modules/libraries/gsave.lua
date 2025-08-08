@@ -72,19 +72,5 @@ end
 ---@param tbl table the table to strip
 ---@return table -- a new table with functions removed
 function modules.libraries.gsave:_strip(tbl)
-    local stripped = {}
-    for k, v in pairs(tbl) do
-        if type(v) == "function" then
-            goto continue
-        end
-
-        if type(v) == "table" then
-            stripped[k] = self:_strip(v)
-        else
-            stripped[k] = v
-        end
-
-        ::continue::
-    end
-    return stripped
+    return modules.libraries.table:strip(tbl, "function")
 end

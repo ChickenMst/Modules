@@ -1,7 +1,8 @@
-modules.classes.ui.screen = {}
+modules.classes.widgets.screen = {}
 
-function modules.classes.ui.screen:create(id, visible, text, x, y, player)
-    ---@class UiScreen
+---@return ScreenWidget
+function modules.classes.widgets.screen:create(id, visible, text, x, y, player)
+    ---@class ScreenWidget
     ---@field player Player|nil
     ---@field id integer
     ---@field name string
@@ -53,4 +54,6 @@ function modules.classes.ui.screen:create(id, visible, text, x, y, player)
             end
         end
     end
+
+    return screen
 end
