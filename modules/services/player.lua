@@ -5,6 +5,7 @@ modules.services.player = modules.services:createService("player", "Handles play
 function modules.services.player:initService()
     self.onJoin = modules.libraries.event:create()
     self.onLeave = modules.libraries.event:create()
+    self.onLoad = modules.libraries.event:create() -- doesnt work in singleplayer
 
     self.players = {}
 end
@@ -51,6 +52,18 @@ function modules.services.player:startService()
             self.onLeave:fire(player) -- fire the event
             self.players[tostring(steam_id)] = player
             self:_save() -- save the player service
+        end
+    end)
+
+    modules.libraries.callbacks:connect("onObjectLoad", function(object_id)
+        local players = self:getOnlinePlayers()
+
+        for _, player in pairs(players) do
+            local playerObjId = server.getPlayerCharacterID(player.peerId)
+            if playerObjId == object_id then
+                modules.libraries.logging:debug("onObjectLoad", "Player loaded with steam_id: " .. player.steamId .. ", name: " .. player.name .. ", peer_id: " .. player.peerId)
+                self.onLoad:fire(player) -- fire the event
+            end
         end
     end)
 end
