@@ -101,7 +101,14 @@ modules.onStart:once(function()
 			else
 				modules.libraries.logging:error("httptest", "No reply received")
 			end
-		end)
+		end, true)
+		modules.services.http:get(8080, "http://localhost:8080/api/server/30/?action=kill", function(request, reply)
+			if reply then
+				modules.libraries.logging:info("httptest", "Received reply: " .. reply)
+			else
+				modules.libraries.logging:error("httptest", "No reply received")
+			end
+		end, true)
 	end)
 end)
 

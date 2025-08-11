@@ -32,8 +32,8 @@ end
 ---@return string
 function modules.libraries.json:escapeString(str)
     -- Escape the string
-    local inChar  = { "\\", "\"", "/", "\b", "\f", "\n", "\r", "\t" }
-    local outChar = { "\\", "\"", "/", "b", "f", "n", "r", "t" }
+    local inChar  = { "\\", "\"", "\b", "\f", "\n", "\r", "\t" }
+    local outChar = { "\\", "\"", "b", "f", "n", "r", "t" }
 
     for i, c in ipairs(inChar) do
         str = str:gsub(c, "\\" .. outChar[i])
@@ -131,7 +131,7 @@ function modules.libraries.json:encode(obj, asKey)
 
         for i, val in ipairs(obj --[[@as table]]) do
             if i > 1 then
-                s[#s + 1] = ", "
+                s[#s + 1] = ","
             end
 
             s[#s + 1] = self:encode(val)
@@ -147,7 +147,7 @@ function modules.libraries.json:encode(obj, asKey)
 
         for k, v in pairs(obj --[[@as table]]) do
             if #s > 1 then
-                s[#s + 1] = ", "
+                s[#s + 1] = ","
             end
 
             s[#s + 1] = self:encode(k, true)

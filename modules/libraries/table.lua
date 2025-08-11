@@ -70,3 +70,15 @@ function modules.libraries.table:strip(tbl, typeOf)
     end
     return stripped
 end
+
+function modules.libraries.table:deepCopy(tbl)
+    local copy = {}
+    for k, v in pairs(tbl) do
+        if type(v) == "table" then
+            copy[k] = self:copy(v)
+        else
+            copy[k] = v
+        end
+    end
+    return copy
+end
