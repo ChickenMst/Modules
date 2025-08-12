@@ -19,7 +19,22 @@ function modules.services.http:startService()
         end
         local requestId = self:_deformatToId(request)
         modules.libraries.logging:debug("httpReply", "Received reply for request ID: " .. tostring(requestId) .. ": " .. reply)
-        self.requests[requestId]:func(reply) -- call the callback function with the reply
+        if requestId == nil then
+            local grouped = self:_deformatGrouped(request)
+            if type(modules.libraries.json:decode(reply)) == "table" then
+                reply = modules.libraries.json:decode(reply)
+            end
+            for _, requested in pairs(grouped) do
+                if self.requests[requested.id] then
+                    self.requests[requested.id]:func(reply) -- call the callback function with the reply
+                    modules.libraries.logging:debug("httpReply", "Grouped request ID: " .. tostring(requested.id) .. " processed with reply: ")
+                else
+                    modules.libraries.logging:warning("httpReply", "Grouped request ID: " .. tostring(requested.id) .. " not found in requests table")
+                end
+            end
+        else
+            self.requests[requestId]:func(reply) -- call the callback function with the reply
+        end
     end)
 
     modules.libraries.callbacks:connect("onTick", function(game_ticks)
@@ -89,6 +104,16 @@ end
 
 function modules.services.http:_deformatToId(formatedRequest)
     local request = string.gsub(formatedRequest, "/api/http/get%?request=", "")
+    modules.libraries.logging:debug("http:_deformatToId", "Deformatted request: " .. request)
     request = modules.libraries.json:decode(request)
     return request and request.id or nil
+end
+
+function modules.services.http:_deformatGrouped(groupedRequest)
+    local request = string.gsub(groupedRequest, "/api/http/group%?request=", "")
+    modules.libraries.logging:debug("http:_deformatGrouped", "Deformatted grouped request: " .. request)
+    request = modules.libraries.json:decode(request)
+    if type(request) == "table" then
+        return request
+    end
 end
