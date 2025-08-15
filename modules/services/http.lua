@@ -10,6 +10,12 @@ function modules.services.http:initService()
     self.groupedRequests = {} -- table to store grouped requests
     self.counter = 0 -- counter for request IDs
     self.backendPort = modules.libraries.settings:getValue("backendPort",true, 8080) -- default backend port
+
+    if modules.addonReason == "reload" then
+        self:_load()
+    elseif modules.addonReason == "load" then
+        self:_load(true)
+    end
 end
 
 function modules.services.http:startService()
@@ -25,20 +31,21 @@ function modules.services.http:startService()
             end
             for _, requested in pairs(grouped) do
                 if self.requests[requested.id] then
-                    modules.libraries.logging:debug("httpReply", "Received reply for grouped request ID: " .. tostring(requested.id))
+                    modules.libraries.logging:debug("httpReply()", "Received reply for grouped request ID: " .. tostring(requested.id))
                     for _, v in pairs(reply) do -- find the matching request ID in the grouped reply
                         if v.id == requested.id then
                             self.requests[requested.id]:func(v) -- call the callback function with the reply
                         end
                     end
                 else
-                    modules.libraries.logging:warning("httpReply", "Grouped request ID: " .. tostring(requested.id) .. " not found in requests table")
+                    modules.libraries.logging:warning("httpReply()", "Grouped request ID: " .. tostring(requested.id) .. " not found in requests table")
                 end
             end
         else
-            modules.libraries.logging:debug("httpReply", "Received reply for request ID: " .. tostring(requestId) .. ": " .. reply)
+            modules.libraries.logging:debug("httpReply()", "Received reply for request ID: " .. tostring(requestId) .. ": " .. reply)
             self.requests[requestId]:func(reply) -- call the callback function with the reply
         end
+        self:_save() -- save the service state after receiving a reply
     end)
 
     modules.libraries.callbacks:connect("onTick", function(game_ticks)
@@ -49,7 +56,7 @@ function modules.services.http:startService()
 
             server.httpGet(self.backendPort, formatedRequest) -- send the grouped request
 
-            modules.libraries.logging:debug("onTick", "Sent grouped request: "..formatedRequest)
+            modules.libraries.logging:debug("http:onTick()", "Sent grouped request: "..formatedRequest)
 
             self.groupedRequests = {} -- clear the grouped requests after sending
         end
@@ -67,24 +74,25 @@ function modules.services.http:get(port, url, callback, groupedRequest)
     if groupedRequest then
         table.insert(self.groupedRequests, requestId)
 
-        modules.libraries.logging:debug("http:get", "Request with ID: " .. tostring(requestId) .. " has been saved to be sent as a grouped request")
+        modules.libraries.logging:debug("http:get()", "Request with ID: " .. tostring(requestId) .. " has been saved to be sent as a grouped request")
     else
         local formatedRequest = self:_format(self.requests[requestId])
 
         -- Send the HTTP request
         server.httpGet(port, formatedRequest)
 
-        modules.libraries.logging:debug("http:get", "Sent request with ID: " .. tostring(requestId) .. " to port: " .. tostring(port) .. " with URL: " .. url .. " formated to: "..formatedRequest)
+        modules.libraries.logging:debug("http:get()", "Sent request with ID: " .. tostring(requestId) .. " to port: " .. tostring(port) .. " with URL: " .. url .. " formated to: "..formatedRequest)
 
         return self.requests[requestId]
     end
+    self:_save() -- save the service state after adding a new request
 end
 
 function modules.services.http:_format(request)
     -- Format the request for sending
     local striped = modules.libraries.table:strip(request, "function")
     local jsonRequest = modules.libraries.json:encode(striped)
-    modules.libraries.logging:debug("http:_format", "Formatted request: " .. jsonRequest)
+    modules.libraries.logging:debug("http:_format()", "Formatted request: " .. jsonRequest)
     return "/api/http/get?request="..jsonRequest
 end
 
@@ -94,9 +102,9 @@ function modules.services.http:_formatGrouped(requestIds)
         local request = self.requests[requestId]
         if request then
             table.insert(requests, modules.libraries.table:strip(request, "function"))
-            modules.libraries.logging:debug("onTick", "Grouped request ID: " .. tostring(requestId) .. " preped for sending")
+            modules.libraries.logging:debug("http:_formatGrouped()", "Grouped request ID: " .. tostring(requestId) .. " preped for sending")
         else
-            modules.libraries.logging:warning("onTick", "Request ID: " .. tostring(requestId) .. " not found in requests table")
+            modules.libraries.logging:warning("http:_formatGrouped()", "Request ID: " .. tostring(requestId) .. " not found in requests table")
         end
     end
 
@@ -108,16 +116,32 @@ end
 
 function modules.services.http:_deformatToId(formatedRequest)
     local request = string.gsub(formatedRequest, "/api/http/get%?request=", "")
-    modules.libraries.logging:debug("http:_deformatToId", "Deformatted request: " .. request)
+    modules.libraries.logging:debug("http:_deformatToId()", "Deformatted request: " .. request)
     request = modules.libraries.json:decode(request)
     return request and request.id or nil
 end
 
 function modules.services.http:_deformatGrouped(groupedRequest)
     local request = string.gsub(groupedRequest, "/api/http/group%?request=", "")
-    modules.libraries.logging:debug("http:_deformatGrouped", "Deformatted grouped request: " .. request)
+    modules.libraries.logging:debug("http:_deformatGrouped()", "Deformatted grouped request: " .. request)
     request = modules.libraries.json:decode(request)
     if type(request) == "table" then
         return request
+    end
+end
+
+function modules.services.http:_save()
+    modules.libraries.gsave:saveService("http", self)
+end
+
+function modules.services.http:_load(load)
+    local loaded = modules.libraries.gsave:loadService("http")
+    if loaded and not load then
+        self.requests = loaded.requests or self.requests
+        self.groupedRequests = loaded.groupedRequests or self.groupedRequests
+        self.counter = loaded.counter or self.counter
+        modules.libraries.logging:debug("http:_load()", "HTTP service loaded with " .. #self.requests .. " requests and " .. #self.groupedRequests .. " grouped requests")
+    elseif loaded and load then
+        self.counter = loaded.counter or self.counter
     end
 end
