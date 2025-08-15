@@ -18,7 +18,6 @@ function modules.services.http:startService()
             return
         end
         local requestId = self:_deformatToId(request)
-        modules.libraries.logging:debug("httpReply", "Received reply for request ID: " .. tostring(requestId) .. ": " .. reply)
         if requestId == nil then
             local grouped = self:_deformatGrouped(request)
             if type(modules.libraries.json:decode(reply)) == "table" then
@@ -26,28 +25,33 @@ function modules.services.http:startService()
             end
             for _, requested in pairs(grouped) do
                 if self.requests[requested.id] then
-                    self.requests[requested.id]:func(reply) -- call the callback function with the reply
-                    modules.libraries.logging:debug("httpReply", "Grouped request ID: " .. tostring(requested.id) .. " processed with reply: ")
+                    modules.libraries.logging:debug("httpReply", "Grouped request ID: " .. tostring(requested.id) .. " processed reply: "..modules.libraries.table:tostring(reply))
+                    for _, v in pairs(reply) do -- find the matching request ID in the grouped reply
+                        if v.id == requested.id then
+                            self.requests[requested.id]:func(v) -- call the callback function with the reply
+                        end
+                    end
                 else
                     modules.libraries.logging:warning("httpReply", "Grouped request ID: " .. tostring(requested.id) .. " not found in requests table")
                 end
             end
         else
+            modules.libraries.logging:debug("httpReply", "Received reply for request ID: " .. tostring(requestId) .. ": " .. reply)
             self.requests[requestId]:func(reply) -- call the callback function with the reply
         end
     end)
 
     modules.libraries.callbacks:connect("onTick", function(game_ticks)
-        if #self.groupedRequests > 0 then
-            local group = modules.libraries.table:deepCopy(self.groupedRequests)
-            for _, requestId in pairs(group) do
-                self.groupedRequests[requestId] = nil -- remove the request from the requests table
-            end
+        if #self.groupedRequests ~= 0 then
+            local group = self.groupedRequests
+
             local formatedRequest = self:_formatGrouped(group)
 
             server.httpGet(self.backendPort, formatedRequest) -- send the grouped request
 
             modules.libraries.logging:debug("onTick", "Sent grouped request: "..formatedRequest)
+
+            self.groupedRequests = {} -- clear the grouped requests after sending
         end
     end)
 end

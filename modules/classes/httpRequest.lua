@@ -3,7 +3,7 @@ modules.classes.httpRequest = {}
 ---@param request string
 ---@param port number
 ---@param id number
----@param func fun(request:string, reply: string) | nil
+---@param func fun(request:HttpRequest, reply: any) | nil
 ---@return HttpRequest
 function modules.classes.httpRequest:create(request, port, id, func)
     ---@class HttpRequest
