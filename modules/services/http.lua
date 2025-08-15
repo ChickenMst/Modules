@@ -25,7 +25,7 @@ function modules.services.http:startService()
             end
             for _, requested in pairs(grouped) do
                 if self.requests[requested.id] then
-                    modules.libraries.logging:debug("httpReply", "Grouped request ID: " .. tostring(requested.id) .. " processed reply: "..modules.libraries.table:tostring(reply))
+                    modules.libraries.logging:debug("httpReply", "Received reply for grouped request ID: " .. tostring(requested.id))
                     for _, v in pairs(reply) do -- find the matching request ID in the grouped reply
                         if v.id == requested.id then
                             self.requests[requested.id]:func(v) -- call the callback function with the reply
