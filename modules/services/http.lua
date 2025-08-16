@@ -32,10 +32,14 @@ function modules.services.http:startService()
             for _, requested in pairs(grouped) do
                 if self.requests[requested.id] then
                     modules.libraries.logging:debug("httpReply()", "Received reply for grouped request ID: " .. tostring(requested.id))
-                    for _, v in pairs(reply) do -- find the matching request ID in the grouped reply
-                        if v.id == requested.id then
-                            self.requests[requested.id]:func(v) -- call the callback function with the reply
+                    if type(reply) == "table" then
+                        for _, v in pairs(reply) do -- find the matching request ID in the grouped reply
+                            if v.id == requested.id then
+                                self.requests[requested.id]:func(v) -- call the callback function with the reply
+                            end
                         end
+                    else
+                        self.requests[requested.id]:func(reply) -- call the callback function with the reply
                     end
                 else
                     modules.libraries.logging:warning("httpReply()", "Grouped request ID: " .. tostring(requested.id) .. " not found in requests table")
@@ -137,11 +141,18 @@ end
 function modules.services.http:_load(load)
     local loaded = modules.libraries.gsave:loadService("http")
     if loaded and not load then
-        self.requests = loaded.requests or self.requests
-        self.groupedRequests = loaded.groupedRequests or self.groupedRequests
-        self.counter = loaded.counter or self.counter
-        modules.libraries.logging:debug("http:_load()", "HTTP service loaded with " .. #self.requests .. " requests and " .. #self.groupedRequests .. " grouped requests")
+        for id, request in pairs(loaded.requests) do
+            if type(request) == "table" then
+                self.requests[id] = modules.classes.httpRequest:create(request.url, request.port, id, function(request, reply)
+                    modules.libraries.logging:error("httpRequest", "Http reply received after reload or load, function no longer exists for ID: " .. tostring(id))
+                end)
+            else
+                modules.libraries.logging:warning("http:_load()", "Invalid request format for ID: " .. tostring(id))
+            end
+        end
+        self.counter = math.floor(loaded.counter) or self.counter
+        modules.libraries.logging:debug("http:_load()", "HTTP service loaded with " .. #self.requests .. " requests")
     elseif loaded and load then
-        self.counter = loaded.counter or self.counter
+        self.counter = math.floor(loaded.counter) or self.counter
     end
 end

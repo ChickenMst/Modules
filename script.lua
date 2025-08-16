@@ -96,14 +96,14 @@ modules.onStart:once(function()
 
 	modules.services.command:create("httptest", {}, {}, "test HTTP service", function(player, full_message, command, args, hasPerm)
 		modules.services.http:get(8080, "http://localhost:8080/api/server/301/?action=kill", function(request, reply)
-			if reply then
+			if type(reply) == "table" then
 				modules.libraries.logging:debug("httptest", "Received reply: " .. modules.libraries.table:tostring(reply))
 			else
 				modules.libraries.logging:error("httptest", "No reply received")
 			end
 		end, true)
 		modules.services.http:get(8080, "http://localhost:8080/api/server/30/?action=kill", function(request, reply)
-			if reply then
+			if type(reply) == "table" then
 				modules.libraries.logging:debug("httptest", "Received reply: " .. modules.libraries.table:tostring(reply))
 			else
 				modules.libraries.logging:error("httptest", "No reply received")
