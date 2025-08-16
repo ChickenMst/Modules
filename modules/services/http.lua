@@ -29,20 +29,23 @@ function modules.services.http:startService()
             if type(modules.libraries.json:decode(reply)) == "table" then
                 reply = modules.libraries.json:decode(reply)
             end
-            for _, requested in pairs(grouped) do
-                if self.requests[requested.id] then
-                    modules.libraries.logging:debug("httpReply()", "Received reply for grouped request ID: " .. tostring(requested.id))
-                    if type(reply) == "table" then
-                        for _, v in pairs(reply) do -- find the matching request ID in the grouped reply
-                            if v.id == requested.id then
-                                self.requests[requested.id]:func(v) -- call the callback function with the reply
+
+            if grouped then
+                for _, requested in pairs(grouped) do
+                    if self.requests[requested.id] then
+                        modules.libraries.logging:debug("httpReply()", "Received reply for grouped request ID: " .. tostring(requested.id))
+                        if type(reply) == "table" then
+                            for _, v in pairs(reply) do -- find the matching request ID in the grouped reply
+                                if v.id == requested.id then
+                                    self.requests[requested.id]:func(v) -- call the callback function with the reply
+                                end
                             end
+                        else
+                            self.requests[requested.id]:func(reply) -- call the callback function with the reply
                         end
                     else
-                        self.requests[requested.id]:func(reply) -- call the callback function with the reply
+                        modules.libraries.logging:warning("httpReply()", "Grouped request ID: " .. tostring(requested.id) .. " not found in requests table")
                     end
-                else
-                    modules.libraries.logging:warning("httpReply()", "Grouped request ID: " .. tostring(requested.id) .. " not found in requests table")
                 end
             end
         else
@@ -58,15 +61,23 @@ function modules.services.http:startService()
 
             local formatedRequest = self:_formatGrouped(group)
 
-            server.httpGet(self.backendPort, formatedRequest) -- send the grouped request
+            if formatedRequest then
+                server.httpGet(self.backendPort, formatedRequest) -- send the grouped request
 
-            modules.libraries.logging:debug("http:onTick()", "Sent grouped request: "..formatedRequest)
+                modules.libraries.logging:debug("http:onTick()", "Sent grouped request: "..formatedRequest)
+            end
 
             self.groupedRequests = {} -- clear the grouped requests after sending
         end
     end)
 end
 
+-- send a http or grouped http request through the backend
+---@param port number
+---@param url string
+---@param callback function
+---@param groupedRequest boolean
+---@return HttpRequest|nil
 function modules.services.http:get(port, url, callback, groupedRequest)
     -- Increment the counter for a new request ID
     self.counter = self.counter + 1
@@ -92,6 +103,9 @@ function modules.services.http:get(port, url, callback, groupedRequest)
     self:_save() -- save the service state after adding a new request
 end
 
+-- internal function to format the request for sending
+---@param request HttpRequest
+---@return string
 function modules.services.http:_format(request)
     -- Format the request for sending
     local striped = modules.libraries.table:strip(request, "function")
@@ -100,6 +114,9 @@ function modules.services.http:_format(request)
     return "/api/http/get?request="..jsonRequest
 end
 
+-- internal function to format grouped requests for sending
+---@param requestIds table<number>
+---@return string|nil
 function modules.services.http:_formatGrouped(requestIds)
     local requests = {}
     for _, requestId in pairs(requestIds) do
@@ -118,6 +135,9 @@ function modules.services.http:_formatGrouped(requestIds)
     end
 end
 
+-- internal function to deformat the request ID from the formatted request string
+---@param formatedRequest string
+---@return number|nil
 function modules.services.http:_deformatToId(formatedRequest)
     local request = string.gsub(formatedRequest, "/api/http/get%?request=", "")
     modules.libraries.logging:debug("http:_deformatToId()", "Deformatted request: " .. request)
@@ -125,6 +145,9 @@ function modules.services.http:_deformatToId(formatedRequest)
     return request and request.id or nil
 end
 
+-- internal function to deformat grouped requests from the formatted request string
+---@param groupedRequest string
+---@return table|nil
 function modules.services.http:_deformatGrouped(groupedRequest)
     local request = string.gsub(groupedRequest, "/api/http/group%?request=", "")
     modules.libraries.logging:debug("http:_deformatGrouped()", "Deformatted grouped request: " .. request)
@@ -134,10 +157,13 @@ function modules.services.http:_deformatGrouped(groupedRequest)
     end
 end
 
+-- internal function to save the HTTP service to gsave
 function modules.services.http:_save()
     modules.libraries.gsave:saveService("http", self)
 end
 
+-- internal function to load the HTTP service form gsave
+---@param load boolean|nil
 function modules.services.http:_load(load)
     local loaded = modules.libraries.gsave:loadService("http")
     if loaded and not load then
