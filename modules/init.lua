@@ -12,9 +12,8 @@ modules.onStart = modules.classes.event:create() -- event for when the server st
 
 modules.onServiceInit = modules.classes.event:create() -- event for when a service is initialized
 
--- add services and addons after loading everything else
+-- add services after loading everything else
 require "modules.services" -- load the services
-require "modules.addons" -- load the addons
 
 -- internal function to set the isDedicated variable
 function modules:_setIsDedicated()

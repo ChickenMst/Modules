@@ -4,6 +4,7 @@ modules.services.addon = modules.services:createService("addons", "Addons Servic
 
 function modules.services.addon:initService()
     self.addons = {} ---@type table <string, Addon>
+    require "addons" -- load the addons
 end
 
 function modules.services.addon:startService()
