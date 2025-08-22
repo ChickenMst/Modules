@@ -57,10 +57,10 @@ function modules.services.vehicle:startService()
         end
 
         if loaded and not vGroup.isLoaded then
-            modules.libraries.logging:debug("onVehicleLoad", "Vehicle group loaded with id: " .. vGroup.group_id)
+            modules.libraries.logging:debug("onVehicleLoad", "Vehicle group loaded with id: " .. vGroup.groupId)
             vGroup:loaded()
-            self.loadedVehicles[tostring(vGroup.group_id)] = vGroup
-            self.loadingVehicles[tostring(vGroup.group_id)] = nil
+            self.loadedVehicles[tostring(vGroup.groupId)] = vGroup
+            self.loadingVehicles[tostring(vGroup.groupId)] = nil
             self.onGroupload:fire(vGroup)
             self:_save()
         end
@@ -75,7 +75,7 @@ function modules.services.vehicle:startService()
 
         if vGroup.vehicles[vehicle_id] then
             if modules.libraries.logging.loggingdetail == "full" then
-                modules.libraries.logging:debug("onVehicleDespawn", "Vehicle despawned with id: " .. vehicle_id .. ", group id: " .. vGroup.group_id)
+                modules.libraries.logging:debug("onVehicleDespawn", "Vehicle despawned with id: " .. vehicle_id .. ", group id: " .. vGroup.groupId)
             end
             vGroup.vehicles[vehicle_id]:despawned()
             self.onVehicleDespawn:fire(vGroup, vehicle_id)
@@ -89,10 +89,10 @@ function modules.services.vehicle:startService()
         end
 
         if despawned then
-            modules.libraries.logging:debug("onVehicleDespawn", "Vehicle group despawned with id: " .. vGroup.group_id)
+            modules.libraries.logging:debug("onVehicleDespawn", "Vehicle group despawned with id: " .. vGroup.groupId)
             vGroup:despawned()
             self.onGroupDespawn:fire(vGroup)
-            self.loadedVehicles[vGroup.group_id] = nil
+            self.loadedVehicles[vGroup.groupId] = nil
             self:_save()
         end
     end)
@@ -135,12 +135,12 @@ function modules.services.vehicle:_load()
     if service.loadingVehicles then
         local rebuilt = {} -- table to rebuild loading vehicles
         for _,vGroup in pairs(service.loadingVehicles) do
-            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.group_id, modules.services.player:getPlayer(vGroup.owner.steamId), vGroup.spawnTime)
+            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.groupId, modules.services.player:getPlayer(vGroup.owner.steamId), vGroup.spawnTime)
             for _, vehicle in pairs(vGroup.vehicles) do
-                local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.group_id, vehicle.isLoaded)
+                local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.groupId, vehicle.isLoaded)
                 rebuiltGroup:addVehicle(rebuiltVehicle)
             end
-            rebuilt[vGroup.group_id] = rebuiltGroup
+            rebuilt[vGroup.groupId] = rebuiltGroup
         end
         self.loadingVehicles = rebuilt
     end
@@ -148,12 +148,12 @@ function modules.services.vehicle:_load()
     if service.loadedVehicles then
         local rebuilt = {} -- table to rebuild loading vehicles
         for _,vGroup in pairs(service.loadedVehicles) do
-            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.group_id, modules.services.player:getPlayer(vGroup.owner.steamId), vGroup.spawnTime, vGroup.isLoaded)
+            local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.groupId, modules.services.player:getPlayer(vGroup.owner.steamId), vGroup.spawnTime, vGroup.isLoaded)
             for _, vehicle in pairs(vGroup.vehicles) do
-                local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.group_id, vehicle.isLoaded)
+                local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.groupId, vehicle.isLoaded)
                 rebuiltGroup:addVehicle(rebuiltVehicle)
             end
-            rebuilt[vGroup.group_id] = rebuiltGroup
+            rebuilt[vGroup.groupId] = rebuiltGroup
         end
         self.loadedVehicles = rebuilt
     end

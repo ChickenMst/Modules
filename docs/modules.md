@@ -87,7 +87,7 @@ popupScreen:update() -- update the popup screen
 
 popupScreen:destroy() -- removes popup screen from all players
 ```
-## modules.classes.addon
+### modules.classes.addon
 This class is for addons to modules. addons can be dynamicly created, destroyed, enabled and disabled. They could provide extras like an antisteal etc to modules by just adding the script into the addons folder. For the addon to actually work it is recommended to use `modules.services.addon:createAddon()`.
 ```lua
 ---@param name string -- the name of the addon
@@ -187,7 +187,7 @@ function addon:startAddon()
     end
 end
 ```
-## modules.classes.command
+### modules.classes.command
 This class is for the custom command handling via `modules.services.command`. It allows for an easy way to make commands with aliases, permisions and more. This class is mostly info, and requires to be made via `modules.services.command:create()` to work.
 ```lua
 ---@param commandstr string -- the string that for the main command, can be with or without ?
@@ -245,7 +245,7 @@ modules.classes.command:create("aliastest", {"a","at","alias"}, {}, "show the al
     modules.libraries.logging:info("aliastest command", "the command was run by: "..command) -- prints the alias or command the command was called by
 end)
 ```
-## modules.classes.connection
+### modules.classes.connection
 This class is a helper class for event class. It represents a connection (function connected to the event) allowing for connections to be disconnected from an event at any time. Because of this you will never need to create a connection object yourself.
 ```lua
 ---@param callback function -- the function to be run when the connection is fired
@@ -268,7 +268,7 @@ connection:fire(...) -- calls the function and passes through the parameters fro
 
 connection:disconnect() -- disconnects the connection from the parent event
 ```
-## modules.classes.event
+### modules.classes.event
 This class allow for events. Functions can be connected to it by turning them into connections then be ran when the event is fired.
 ```lua
 ---@return Event -- return class object
@@ -333,7 +333,7 @@ connection:disconnect()
 -- or this to disconnect from the event
 event:disconnect(connection)
 ```
-## modules.classes.httpRequest
+### modules.classes.httpRequest
 This class is used by `modules.services.http` to represent a http request to the backend.
 ```lua
 ---@param request string -- request or url for the http request
@@ -353,7 +353,7 @@ httpRequest.id -- request id is given by modules.services.http
 
 httpRequest.func -- function to be called when the http request gets its reply
 ```
-## modules.classes.loop
+### modules.classes.loop
 This class by `modules.services.loop` to make the loop objects. It runs the function given to it every time the inputed time has passed. This will more thank likely be replaced by something better. For it to work it needs to be made with `modules.services.loop:create()`
 ```lua
 ---@param time number -- how often it runs in seconds
@@ -398,7 +398,7 @@ loop:editTime(2) -- change the time period of the loop
 
 loop:setPaused(false) -- unpause the loop
 ```
-## modules.classes.player
+### modules.classes.player
 This class represents a stormworks player. It made by `modules.services.player` when a player joins or a player dosnt have a class for it. You will not need to manually create this for a player as `modules.services.player` handles all of that.
 ```lua
 ---@param peerId number -- players peer_id
@@ -473,4 +473,104 @@ player:teleport(pos) -- teleports player to the inputed matrix
 
 ---@return table -- matrix table
 player:getPos() -- returns the players position as matrix
+```
+### modules.classes.service
+This class represents a service in `modules`. allows for the service to be initalised and then started. must be called via `modules.services:createService()` to be initalised and started automaticly by modules.
+```lua
+---@param name string -- name of the service
+---@param description string -- a description of the servoce
+---@param authors table<string> -- table of the services authors
+---@return Service -- returns class object
+modules.classes.service:create(name, description, authors)
+```
+The class objects functions and variables:
+```lua
+service.name -- name of the service
+
+service.description -- description of the service
+
+service.authors -- table of the services authors
+
+service.hasInit -- boolean if the service has been initalised
+
+service.hasStarted -- boolean if the service has been started
+```
+Example usage:
+```lua
+service = modules.classes.service:create("service", "its a service", {"ChickenMst"}) -- create the service. remember to use modules.services:createService()
+
+function service:initService() -- required even if its empty
+    self.value = 21 -- put any values etc that you need to get / create before the service starts
+end
+
+function service:startService() -- required even if its empty
+    modules.libraries.logging:info("service", "i has started, here is my value: "..self.value)
+end
+
+function service:changeValue() -- useing the format servicename:function() allows for the function to be saved into the service. this is the recommended way
+    self.value = self.value + 1 
+end
+```
+### modules.classes.vehicle
+This class represnts a stormworks vehicle. It is use along with `modules.classes.vehicleGroup` to manage the vehicles. You will not need to create an object of this class, you can get the vehicles group by using `modules.services.vehicle:getVehicleGroup()`.
+```lua
+---@param vehicleId number -- the vehicles vehicle_id
+---@param groupId number|string -- the vehicles group_id
+---@param loaded boolean|nil -- if the vehicle has been loaded yet
+---@return Vehicle -- returns a class object
+modules.classes.vehicle:create(vehicleId, groupId, loaded)
+```
+The class objects functions and variables:
+```lua
+vehicle.id -- the vehicles vehicle_id
+
+vehicle.groupId -- the vehicles group_id
+
+vehicle.onDespawn -- event for when the vehicle is despawned
+
+vehicle.onLoaded -- event for when the vehicle has been loaded
+
+vehicle.isLoaded -- if the vehicle is loaded or not
+
+vehicle.isDespawned -- if the vehicle has bene despawned
+
+vehicle:despawned() -- function modules.services.vehicle calls when the vehicle gets despawned
+
+vehicle:loaded() -- function modules.services.vehicle calls when the vehicle is loaded
+```
+### modules.classes.vehicleGroup
+This class represents a stormworks vehicle group. It is use along with `modules.classes.vehicle` to manage the vehicles. You will not need to create an object of this class, you can get the vehicle group by using `modules.services.vehicle:getVehicleGroup()`.
+```lua
+---@param group_id number|string -- group_id of the vehicle group
+---@param owner Player|nil -- the player that owns the vehicle group
+---@param spawnTime number|nil -- when the vehicle group was spawned
+---@param loaded boolean|nil -- if the vehicle group is loaded
+---@return VehicleGroup -- returns class object
+modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded)
+```
+The class objects functions and variables:
+```lua
+vehicleGroup.groupId -- vehicle groups group_id
+
+vehicleGroup.vehicles -- table of vehicles part of the vehicle group
+
+vehicleGroup.owner -- player that owns the vehicle group
+
+vehicleGroup.spawnTime -- time the vehicle was spawned
+
+vehicleGroup.onDespawn -- event for when the vehicle group is despawned
+
+vehicleGroup.onLoaded -- event for when the vehicle group is loaded
+
+vehicleGroup.isLoaded -- if the vehicle group is loaded
+
+vehicleGroup:despawned() -- function modules.services.vehicle calls when the vehicle group is despawned
+
+vehicleGroup:loaded() -- function modules.services.vehicle calls when the vehicle group is loaded
+
+---@param newowner Player -- the new player you want to own the vehicle group
+vehicleGroup:setOwner(newowner) -- set the new owner for the vehicle group
+
+---@param vehicle Vehicle -- vehicle you want to add to the vehicle group
+vehicleGroup:addVehicle(vehicle) -- add a vehicle to the vehicle group
 ```
