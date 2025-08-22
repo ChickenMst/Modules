@@ -1,8 +1,8 @@
-modules.classes.widgets.screen = {}
+modules.classes.widgets.popupScreen = {}
 
----@return ScreenWidget
-function modules.classes.widgets.screen:create(id, visible, text, x, y, player)
-    ---@class ScreenWidget
+---@return PopupScreenWidget
+function modules.classes.widgets.popupScreen:create(id, visible, text, x, y, player)
+    ---@class PopupScreenWidget
     ---@field player Player|nil
     ---@field id integer
     ---@field name string

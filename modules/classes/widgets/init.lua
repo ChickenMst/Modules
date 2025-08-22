@@ -1,3 +1,3 @@
 modules.classes.widgets = {}
 
-require "modules.classes.widgets.screen"
+require "modules.classes.widgets.popupScreen"

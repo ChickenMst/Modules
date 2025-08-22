@@ -91,7 +91,7 @@ end
 ---@param player Player|nil The player to show the popup to (default is nil, which means all players)
 function modules.services.ui:createPopupScreen(text, x, y, visable, player)
     local id = server.getMapID()
-    local widget = modules.classes.widgets.screen:create(id, visable, text, x, y, player)
+    local widget = modules.classes.widgets.popupScreen:create(id, visable, text, x, y, player)
 
     widget:update()
     self:_addWidget(widget)
