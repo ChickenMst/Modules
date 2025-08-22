@@ -246,7 +246,7 @@ modules.classes.command:create("aliastest", {"a","at","alias"}, {}, "show the al
 end)
 ```
 ## modules.classes.connection
-This class is a helper class for event class. It represents a connection (function connected to the event) allowing for connections to be disconnected from an event at any time. because of this you will never need to create a connection object yourself.
+This class is a helper class for event class. It represents a connection (function connected to the event) allowing for connections to be disconnected from an event at any time. Because of this you will never need to create a connection object yourself.
 ```lua
 ---@param callback function -- the function to be run when the connection is fired
 ---@return EventConnection -- returns class object
@@ -352,4 +352,125 @@ httpRequest.port -- the port to send the request on
 httpRequest.id -- request id is given by modules.services.http
 
 httpRequest.func -- function to be called when the http request gets its reply
+```
+## modules.classes.loop
+This class by `modules.services.loop` to make the loop objects. It runs the function given to it every time the inputed time has passed. This will more thank likely be replaced by something better. For it to work it needs to be made with `modules.services.loop:create()`
+```lua
+---@param time number -- how often it runs in seconds
+---@param func function -- the function to be ran
+---@param id number -- id given to it by modules.services.loop
+---@return Loop -- returns class object
+modules.classes.loop:create(time, func, id)
+```
+The class objects functions and variables:
+```lua
+loop.callback -- function to be ran
+
+loop.time -- in seconds how often it runs
+
+loop.creationTime -- the time at which it was made
+
+loop.id -- the id of the loop
+
+loop.paused -- boolean if the loop is paused
+
+---@param state boolean -- if its paused or not
+loop:setPaused(state) -- set the state of paused
+
+---@param newTime number -- the new time period
+loop:editTime(newTime) -- change the time period
+```
+Example usage:
+```lua
+local loop = modules.classes.loop:create(1, function() -- create a loop that runs every second. remember to use modules.services.loop:create() or it won't work
+    modules.libraries.logging:info("loop", "1 second has passed")
+end, 1)
+```
+Example of pausing and updating the time period:
+```lua
+local loop = modules.classes.loop:create(1, function() -- create a loop that runs every second. remember to use modules.services.loop:create() or it won't work
+    modules.libraries.logging:info("loop", "1 second has passed")
+end, 1)
+
+loop:setPaused(true) -- pause the loop
+
+loop:editTime(2) -- change the time period of the loop
+
+loop:setPaused(false) -- unpause the loop
+```
+## modules.classes.player
+This class represents a stormworks player. It made by `modules.services.player` when a player joins or a player dosnt have a class for it. You will not need to manually create this for a player as `modules.services.player` handles all of that.
+```lua
+---@param peerId number -- players peer_id
+---@param steamId string|number -- players steam_id
+---@param name string|nil -- players name
+---@param admin boolean|nil -- if the player is a server admin
+---@param auth boolean|nil -- if the player is authed
+---@param perms table|nil -- table of permissions for the player
+---@param extra table|nil -- emtpy table for any extra data you need to add to the player
+---@return Player -- returns class object
+modules.classes.player:create(peerId, steamId, name, admin, auth, perms, extra)
+```
+The class objects functions and variables:
+```lua
+player.peerId -- players peer_id
+
+player.steamId -- players steam_id
+
+player.name -- players name
+
+player.admin -- boolean if the player has server admin
+
+player.auth -- boolean if the player is authed
+
+player.inGame -- boolean if the player is currently in game / on the server
+
+player.perms -- table of the players permissions
+
+player.extra -- table that can be used to store extra info/data about the player
+
+---@param newName string -- the new name you want to set to
+player:setName(newName) -- set the players name
+
+---@param isAdmin boolean -- if you want the player to have admin or not
+player:setAdmin(isAdmin) -- set the players admin status to isAdmin
+
+---@param isAuth boolean -- if you want to auth the player
+player:setAuth(isAuth) -- set the players auth status to isAuth
+
+---@param key string|number -- key / index of the thing you want to set
+---@param value any -- what you want to set it to
+player:setExtra(key, value) -- set a extra value for the player
+
+---@param key string|number -- key / index of the extra you want to get
+player:getExtra(key) -- get the value of the inputed key
+
+---@param perm string -- the permission you want to change
+---@param value boolean|nil -- the value you want to set it to
+player:setPerm(perm, value) -- set a perm to the inputed value
+
+---@param perm string -- the permission you want to check for
+---@param valueToMatch any|nil -- the value it has to match if it exists
+---@return boolean -- if it exists and or if it matches the value to match
+player:hasPerm(perm, valueToMatch) -- check if the player has a specific permission
+
+---@return table -- the player permissions
+player:getPerms() -- return the players perm table
+
+---@param perm string -- the permission to remove
+player:removePerm(perm) -- removes the permission from the player
+
+player:kick() -- kicks the player from the server
+
+player:ban() -- bans the player from the server
+
+player:kill() -- kills the players character
+
+player:revive() -- revives the players character
+
+---@param pos table -- matrix table
+player:teleport(pos) -- teleports player to the inputed matrix
+
+---@return table -- matrix table
+player:getPos() -- returns the players position as matrix
 ```
