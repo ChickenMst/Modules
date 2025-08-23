@@ -9,6 +9,7 @@ function modules.classes.service:create(name, description, authors)
     ---@field initService function
     ---@field startService function
     local service = {
+        _class = "Service",
         name = name,
         description = description,
         authors = authors,

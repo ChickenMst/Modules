@@ -7,6 +7,7 @@ modules.classes.loop = {} -- table of loop functions
 function modules.classes.loop:create(time, func, id)
     ---@class Loop
     local loop = {
+        _class = "Loop",
         callback = func,
 		time = time,
 		creationTime = server.getTimeMillisec(),

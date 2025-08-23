@@ -10,6 +10,7 @@ function modules.classes.addon:create(name, version, description, authors)
     ---@field initAddon function
     ---@field startAddon function
     local addon = {
+        _class = "Addon",
         name = name,
         version = version,
         authors = authors,

@@ -7,6 +7,7 @@ modules.classes.vehicle = {} -- table of vehicle functions
 function modules.classes.vehicle:create(vehicleId, groupId, loaded)
     ---@class Vehicle
     local vehicle = {
+        _class = "Vehicle",
         id = vehicleId,
         groupId = tostring(groupId),
         onDespawn = modules.libraries.event:create(),

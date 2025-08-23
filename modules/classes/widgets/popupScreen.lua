@@ -11,6 +11,7 @@ function modules.classes.widgets.popupScreen:create(id, visible, text, x, y, pla
     ---@field x number
     ---@field y number
     local screen = {
+        _class = "PopupScreenWidget",
         player = player,
         id = id,
         visible = visible or false,

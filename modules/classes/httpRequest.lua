@@ -8,6 +8,7 @@ modules.classes.httpRequest = {}
 function modules.classes.httpRequest:create(request, port, id, func)
     ---@class HttpRequest
     local httpRequest = {
+        _class = "HttpRequest",
         request = request, -- the request object
         port = port, -- the port the request was made on
         id = math.floor(id) or 0, -- unique ID for the request

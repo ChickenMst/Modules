@@ -4,6 +4,7 @@ modules.classes.event = {} -- table of event functions
 function modules.classes.event:create()
     ---@class Event
     local event = {
+        _class = "Event",
         currentId = 0,
         connections = {},---@type EventConnection[]
         connectionsOrder = {},

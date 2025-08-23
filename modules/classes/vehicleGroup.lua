@@ -8,6 +8,7 @@ modules.classes.vehicleGroup = {} -- table of vehicle functions
 function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded)
     ---@class VehicleGroup
     local vehicleGroup = {
+        _class = "VehicleGroup",
         groupId = tostring(group_id),
         vehicles = {}, ---@type Vehicle[]
         owner = owner,

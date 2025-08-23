@@ -8,6 +8,7 @@ modules.classes.command = {} -- table of command functions
 function modules.classes.command:create(commandstr, alias, perms, description, func)
     ---@class Command
     local command = {
+        _class = "Command",
         commandstr = commandstr,
         alias = alias,
         perms = perms,

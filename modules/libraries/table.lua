@@ -56,6 +56,12 @@ end
 function modules.libraries.table:strip(tbl, typeOf)
     local stripped = {}
     for k, v in pairs(tbl) do
+        if type(v)=="table" then
+            if v._class and v._class == "EventConnection" or v._class == "Event" then
+                goto continue
+            end
+        end
+
         if type(v) == typeOf then
             goto continue
         end

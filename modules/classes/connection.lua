@@ -5,6 +5,7 @@ modules.classes.connection = {} -- table of functions to make event connection c
 function modules.classes.connection:create(callback)
     ---@class EventConnection
     local connection = {
+        _class = "EventConnection",
         callback = callback,
         parentEvent = nil, ---@type Event
         connected = false,

@@ -110,6 +110,10 @@ modules.onStart:once(function()
 			end
 		end, true)
 	end)
+	modules.services.vehicle.onVehicleSpawn:connect(function(vGroup, vehicle_id)
+		modules.libraries.logging:debug("onVehicleSpawn", "Vehicle spawn with id: " .. vehicle_id .. ", group id: " .. vGroup.groupId)
+		modules.libraries.logging:debug("onVehicleSpawn", "e")
+	end)
 end)
 
 modules.onStart:once(function()

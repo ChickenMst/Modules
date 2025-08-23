@@ -11,6 +11,7 @@ modules.classes.player = {} -- table of player functions
 function modules.classes.player:create(peerId, steamId, name, admin, auth, perms, extra)
     ---@class Player
     local player = {
+        _class = "Player",
         peerId = math.floor(peerId),
         steamId = tostring(steamId),
         name = name or "Unknown",
