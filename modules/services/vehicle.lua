@@ -120,7 +120,11 @@ end
 
 -- internal function to save the vehicles service
 function modules.services.vehicle:_save()
-    modules.libraries.gsave:saveService("vehicles", self)
+    local service = {
+        loadingVehicles = self.loadingVehicles,
+        loadedVehicles = self.loadedVehicles,
+    }
+    modules.libraries.gsave:saveService("vehicles", service)
 end
 
 -- internal function to load the saved vehicles from gsave

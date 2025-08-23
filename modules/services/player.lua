@@ -192,7 +192,10 @@ end
 
 -- internal function to save the players to gsave
 function modules.services.player:_save()
-    modules.libraries.gsave:saveService("player", self)
+    local service = {
+        players = self.players
+    }
+    modules.libraries.gsave:saveService("player", service)
 end
 
 -- internal function to verify if the players are online
