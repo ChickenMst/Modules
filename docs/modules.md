@@ -269,7 +269,7 @@ connection:fire(...) -- calls the function and passes through the parameters fro
 connection:disconnect() -- disconnects the connection from the parent event
 ```
 ### modules.classes.event
-This class allow for events. Functions can be connected to it by turning them into connections then be ran when the event is fired.
+This class allow for events. Functions can be connected to it by turning them into connections then be ran when the event is fired. Due to the way connections work events and connections cant be saved into gsave.
 ```lua
 ---@return Event -- return class object
 modules.classes.event:create()
