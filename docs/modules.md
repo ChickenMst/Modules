@@ -269,7 +269,7 @@ connection:fire(...) -- calls the function and passes through the parameters fro
 connection:disconnect() -- disconnects the connection from the parent event
 ```
 ### modules.classes.event
-This class allow for events. Functions can be connected to it by turning them into connections then be ran when the event is fired. Due to the way connections work events and connections cant be saved into gsave.
+This class allow for events. Functions can beections work events and connecti connected to it by turning them into connections then be ran when the event is fired. Due to the way connections cant be saved into gsave.
 ```lua
 ---@return Event -- return class object
 modules.classes.event:create()
@@ -573,4 +573,86 @@ vehicleGroup:setOwner(newowner) -- set the new owner for the vehicle group
 
 ---@param vehicle Vehicle -- vehicle you want to add to the vehicle group
 vehicleGroup:addVehicle(vehicle) -- add a vehicle to the vehicle group
+```
+## modules.libraries
+This table stores all the libraries. It in itself doesnt have any functions.
+### modules.libraries.callbacks
+This library uses events and `_ENV` to allow for functions to be dynamicly connected and disconnected from stormworks game callbacks. use this library instead of the traditional way of using stormworks game callbacks.
+```lua
+---@param name string -- the name of the callback you want to connect to eg: "onPlayerJoin"
+---@param callback function -- the function you want to get run when the callback is called
+---@return EventConnection -- returns the events connection. meaning you can disconnect etc like an event
+modules.libraries.callbacks:connect(name, callback) -- connects your function into specified callback
+
+---@param name string -- the name of the callback you want to connect to eg: "onPlayerJoin"
+---@param callback function -- the function you want to get run when the callback is called
+---@return EventConnection -- returns the events connection. meaning you can disconnect etc like an event
+modules.libraries.callbacks:once(name, callback) -- connects your function into specified callback then disconnects once it has fired
+```
+Example `connect()` usage:
+```lua
+modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth) -- connect into the onPlayerJoin callback
+    modules.libraries.logging:info("callback", "player "..name.." has joined!") -- info message when a player joins
+end)
+```
+Example `once()` usage:
+```lua
+modules.libraries.callbacks:once("onTick", function(game_ticks) -- connect once into onTick callback
+    modules.libraries.logging:info("callback", "the game has ticked. i will not run again") -- info message will only be printed once event if callback is called again
+end)
+```
+Example of using connections:
+```lua
+local connection = modules.libraries.callbacks:connect("onTick", function(game_ticks) -- connect into the callback
+    modules.libraries.logging:info("callback", "game has ticked") -- info message
+end)
+
+connection:disconnect() -- disconnect from the callback
+```
+### modules.libraries.chat
+This library interacts with the games chat. It also saves all the announcements that have been sent.
+```lua
+modules.libraries.chat.messages -- table of announcments
+
+---@param title string -- the title of the announcement
+---@param message string -- the message of the announcement
+---@param target number|nil -- the target player peer_id, nil or -1 for all players
+modules.libraries.chat:announce(title, message, target) -- send announcment into the chat
+```
+Example `announce()` usage:
+```lua
+modules.libraries.chat:announce("[Server]", "this shows in chat to all players!")
+
+modules.libraries.chat:announce("[Server]", "so does this!", -1)
+
+modules.libraries.chat:announce("[Server]", "this only shows to player with the peer_id of 10", 10)
+```
+### modules.libraries.event
+This library is used to make events and also provides `modules.libraries.event.removeConnection`. You dont need to use this as its just another step to call `modules.classes.event:create()`.
+```lua
+modules.libraries.event.removeConnection -- empty table used for disconnecting from an event inside of the function
+
+modules.libraries.event:create() -- just a relay for `modules.classes.event:create()`
+```
+Example `removeConnection` usage:
+```lua
+event:connect(function(worked) -- connect into an event
+    if worked then
+        modules.libraries.logging:info("event", "the thing worked, disconnecting")
+        return modules.libraries.event.removeConnection -- return this to tell the event to remove this connection
+    else
+        modules.libraries.logging:info("event", "the thing didnt work, staying connected")
+    end
+end)
+```
+### modules.libraries.gsave
+This library handles the interactions with `g_savedata`.
+```lua
+---@param name string -- name of the service you want to save
+---@param service any -- the service you want to save
+modules.libraries.gsave:saveService(name, service) -- save a service into gsave. striped of functions and events before its saved
+
+---@param name string -- name of the service you want to load
+---@return Service|table -- the service loaded from g_savedata, or an empty table if not found
+modules.libraries.gsave:loadService(name) -- load a service from gsave. handling of loading it back into the service is up to you
 ```
