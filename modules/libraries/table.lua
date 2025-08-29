@@ -53,6 +53,9 @@ function modules.libraries.table:tostring(tbl, indent)
     return table.concat(toConcatenate, "\n")
 end
 
+---@param tbl table The table to strip.
+---@param typeOf string The type to strip from the table.
+---@return table -- The stripped table.
 function modules.libraries.table:strip(tbl, typeOf)
     local stripped = {}
     for k, v in pairs(tbl) do
@@ -77,11 +80,13 @@ function modules.libraries.table:strip(tbl, typeOf)
     return stripped
 end
 
+---@param tbl any table to copy
+---@return table -- a deep copy of the table
 function modules.libraries.table:deepCopy(tbl)
     local copy = {}
     for k, v in pairs(tbl) do
         if type(v) == "table" then
-            copy[k] = self:copy(v)
+            copy[k] = self:deepCopy(v)
         else
             copy[k] = v
         end

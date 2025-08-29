@@ -656,3 +656,213 @@ modules.libraries.gsave:saveService(name, service) -- save a service into gsave.
 ---@return Service|table -- the service loaded from g_savedata, or an empty table if not found
 modules.libraries.gsave:loadService(name) -- load a service from gsave. handling of loading it back into the service is up to you
 ```
+Example usage of saving and loading a service:
+```lua
+service = modules.services:createService("service", "its a service", {"ChickenMst"})
+
+function service:initService()
+    self.value = 1 -- create the value in init
+end
+
+function service:startService()
+    modules.libraries.logging:info("service", "value is: "..self.value)
+
+    if modules.addonReason == "reload" then
+        self:_load() -- check if the addon has reloaded and the load from gsave
+    end
+
+    modules.libraries.logging:info("service", "value is: "..self.value)
+
+    self.value = self.value + 1 -- change a value
+
+    self:_save() -- save the service
+end
+
+function service:_save()
+    modules.libraries.gsave:saveService("service", self) -- this saves `self` which is the service into gsave
+end
+ 
+function service:_load()
+    local loaded = modules.libraries.gsave:loadService("service") -- laod the service from gsave
+
+    self.value = loaded.value -- set the value in the service to the one saved in gsave
+end
+```
+### modules.libraries.json
+This library turns lua tables into json strings and vice versa.
+```lua
+---@param obj table|number|string|boolean|nil -- the table, number, string, boolean to turn into a json string
+---@param asKey boolean|nil -- used internaly
+---@return string -- returns the encoded json string
+modules.libraries.json:encode(obj, asKey) -- turns lua variables into json string
+
+---@param str string -- the json string
+---@param pos integer|nil -- used internaly
+---@param endDelim string|nil -- used internaly
+---@return any
+---@return integer -- returns the decoded lua variables
+modules.libraries.json:decode(str, pos, endDelim) -- turns json string into lua variables
+```
+Example usage:
+```lua
+local table = {value=1, otherValue=2} -- the table we are going to encode
+
+local encoded = modules.libraries.json:encode(table) -- returns the table as a json string: {"value":1,"otherValue":2}
+
+local decoded = modules.libraries.json:decode(encoded) -- returns the decoded table from the json string: decoded == table
+```
+### modules.libraries.logging
+This library handles all the logging for `modules`. it can either log into chat or into the console that can be see by using a program called 'debugView'.
+```lua
+modules.libraries.logging.logs -- table of all the logs that have happened since last reload, world create or world load
+
+modules.libraries.logging.logtypes = { -- table used to look up log levels
+    DEBUG = 1,
+    INFO = 2,
+    WARNING = 3,
+    ERROR = 4
+}
+
+modules.libraries.logging.loglevel -- setting used to tell if the log is above or equal to the the level you want printed into chat. this can be changed via "logginglevel" in settings
+
+modules.libraries.logging.loggingdetail -- setting for if you have something that spam chat you would check if the detail is full, otherwise you would only do one log sumarising the action. can be changed to either "minimal" or "full" via "loggingdetail" in settings.
+
+modules.libraries.logging.loggingmode -- setting to set if you want it to log to chat or to console. can be changed to "chat" or "console" via "loggingmode" in settings
+
+---@param logtype number -- the log type in number form
+---@param title string -- the title of the log
+---@param message string -- the message for the log
+modules.libraries.logging:log(logtype, title, message) -- log something. preferably use one of the `info()`, `debug()`, `warning()` or `error` functions as it removes the need for you to figure out the log type
+
+---@param state string -- the log level you would like to set to print in chat
+modules.libraries.logging:setLogLevel(state) -- sets the loglevel to the inputed strings corresponding number value
+
+---@param title string -- title of the log
+---@param message string -- message of the log
+modules.libraries.logging:error(title, message) -- error log
+
+---@param title string -- title of the log
+---@param message string -- message of the log
+modules.libraries.logging:warning(title, message) -- warning log
+
+---@param title string -- title of the log
+---@param message string -- message of the log
+modules.libraries.logging:info(title, message) -- info log
+
+---@param title string -- title of the log
+---@param message string -- message of the log
+modules.libraries.logging:debug(title, message) -- debug log
+```
+Example usage:
+```lua
+modules.libraries.logging:info("log title", "log message") -- this usage is the same for all of the log types
+```
+### modules.libraries.settings
+This library handles all of the settings for `modules`. It uses the `settings.lua` file to load settings into modules.
+```lua
+---@param name string -- name of the setting
+---@param value any -- what the settings value is
+---@param default any -- the default value of the setting
+---@return any -- returns either nil if the setting name already is being used or the setting once its created
+modules.libraries.settings:create(name, value, default) -- creates a new setting, not persistent
+
+---@param name string
+---@param default any
+---@return any -- settngs value
+modules.libraries.settings:getSetting(name, default) -- get a setting value. if the setting doesnt exist or it dosnt have a value it returns the inputed default
+
+---@param name string -- name of the setting
+---@param createSettingIfNotExists boolean -- if the setting doesnt exist should it create it
+---@param default any -- default value if it dosnt exist
+---@return any -- returns either the value, default or inputed default
+modules.libraries.settings:getValue(name, createSettingIfNotExists, default) -- prefered way of getting a setting as it check for both the value and the default if neither exists it creates the setting with the inputed default
+
+---@param name string -- name of the setting
+---@param value any -- the value to set it to
+modules.libraries.settings:setValue(name,value) -- set the value of a setting, not persistent
+
+---@param name string -- name of the setting
+---@param default any -- the default to set to
+modules.libraries.settings:setDefault(name,default) -- set the default value of a setting, not persistent
+
+---@param name string -- name of the setting
+modules.libraries.settings:resetToDefault(name) -- resets the settings value to its default, not persistent
+```
+Example `create()` usage:
+```lua
+modules.libraries.settings:create("setting", true, false) -- create a setting called "setting"
+```
+Example `getSetting()` usage:
+```lua
+local value = modules.libraries.settings:getSetting("value", 1) -- get a settings value if it dosnt exist use the value given
+```
+Example `getValue()` usage:
+```lua
+local value = modules.libraries.settings:getValue("value", true, 1) -- get a settings value if it doesnt exist check its default otherwise create the setting with the inputed default
+```
+Example `setValue()` usage:
+```lua
+modules.libraries.settings:setValue("setting", false) -- change settings value, dosnt persist after reload
+```
+Example `setDefault()` usage:
+```lua
+modules.libraries.settings:setDefault("setting", true) -- change settings default value, dosnt persit after reload
+```
+Example `resetToDefault()` usage:
+```lua
+modules.libraries.settings:resetToDefault("setting") -- change the settings value to its default
+```
+Example `settings.lua` layout:
+```lua
+settings = {
+    logginglevel = {value = 1, default = 4}, -- Default log level set to ERROR
+    loggingdetail = {value = "full", default = "full"}, -- Default logging detail set to full
+    targettps = {value = 0, default = 0}, -- Default target TPS set to 0
+}
+
+return settings
+```
+### modules.libraries.table
+This library has functions to manipulate tables.
+```lua
+---@param tbl table -- the table to convert
+---@param indent number|nil -- the current indentation level (default is 0)
+---@return string -- the string representation of the table
+modules.libraries.table:tostring(tbl, indent) -- turn a table into a string, helpful for debuging
+
+---@param tbl table -- the table to strip
+---@param typeOf string -- the type to strip from the table
+---@return string -- returns the table without the specifyed type
+modules.libraries.table:strip(tbl, typeOf) -- strip a table of a specific type of variable
+```
+Example `tostring()` usage:
+```lua
+local table = {value=1}
+
+local string = modules.libraries.table:tostring(table) -- turns the table into a string representation
+
+modules.libraries.logging:info("table", string) -- print the table string
+```
+Example `strip()` usage:
+```lua
+local table = {value=1, stringvalue="1"}
+
+local striped = modules.libraries.table:strip(table, "string") -- strip the table of all strings
+
+-- table is now: table = {value=1}
+```
+## modules.services
+This table stores all the services and the functions to create a service.
+```lua
+modules.services.created -- table of services that have been created
+
+modules.services.ordered -- the order in which the services where made. used to determain the start and init order
+
+---@param name string -- name of the service
+---@param description string -- a description of the service
+---@param authors table<string> -- table of authors for the service
+modules.services:createService(name, description, authors) -- create a service
+
+---@param name string -- name of the service to get
+---@return Service -- 
+modules.services:getService(name)

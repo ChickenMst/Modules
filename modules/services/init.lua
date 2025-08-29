@@ -7,6 +7,7 @@ modules.services.ordered = {}
 ---@param name string
 ---@param description string
 ---@param authors table<string>
+---@return Service
 function modules.services:createService(name, description, authors)
     self.ordered[#self.ordered + 1] = name -- add the service name to the ordered list
     if self.created[name] then
