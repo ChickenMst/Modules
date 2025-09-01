@@ -864,5 +864,19 @@ modules.services.ordered -- the order in which the services where made. used to 
 modules.services:createService(name, description, authors) -- create a service
 
 ---@param name string -- name of the service to get
----@return Service -- 
-modules.services:getService(name)
+---@return Service -- returns the requested service
+modules.services:getService(name) --  get a service from services
+```
+Example `createService()` usage:
+```lua
+service = modules.services:createService("service", "its a service", {"ChickenMst"}) -- create the service
+
+function service:initService()
+    self.value = 10 -- put any values or things you need before the service starts
+end
+
+function service:startService()
+    modules.libraries.logging:info("service", "value: "..self.value) -- anyhing you need to run once its started
+end
+```
+###
