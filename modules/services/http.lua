@@ -122,7 +122,13 @@ function modules.services.http:_formatGrouped(requestIds)
     for _, requestId in pairs(requestIds) do
         local request = self.requests[requestId]
         if request then
-            table.insert(requests, modules.libraries.table:strip(request, "function"))
+            local stripedRequest = modules.libraries.table:strip(request, "function")
+
+            if stripedRequest._class then
+                stripedRequest._class = nil
+            end
+
+            table.insert(requests, stripedRequest)
             modules.libraries.logging:debug("http:_formatGrouped()", "Grouped request ID: " .. tostring(requestId) .. " preped for sending")
         else
             modules.libraries.logging:warning("http:_formatGrouped()", "Request ID: " .. tostring(requestId) .. " not found in requests table")
