@@ -8,6 +8,7 @@ function modules.services.player:initService()
     self.onLoad = modules.libraries.event:create() -- doesnt work in singleplayer
 
     self.players = {}
+    self.peerIdIndex = {} -- used to convert peerId to steamId
 end
 
 
@@ -32,6 +33,7 @@ function modules.services.player:startService()
         player.inGame = true -- set the player as in-game
         player.peerId = peer_id -- update the peer_id
         self.players[tostring(steam_id)] = player -- add the player to the table
+        self.peerIdIndex[tostring(peer_id)] = tostring(steam_id) -- map peerId to steamId
         self:_save() -- save the player service
         self.onJoin:fire(player) -- fire the event
     end)
@@ -72,14 +74,9 @@ end
 ---@param steam_id string
 ---@return Player|nil
 function modules.services.player:getPlayer(steam_id)
-    for _,player in pairs(self:getPlayers()) do
-        if modules.libraries.logging.loggingdetail == "full" then
-            modules.libraries.logging:debug("services.player:getPlayer", "Checking player with steam_id: " .. player.steamId)
-        end
-        if player.steamId == tostring(steam_id) then
-            modules.libraries.logging:debug("services.player:getPlayer", "Found player: " .. player.name .. " from steam_id: " .. player.steamId)
-            return player -- return the player object if found
-        end
+    if self.players[tostring(steam_id)] then
+        modules.libraries.logging:debug("services.player:getPlayer", "Found player with steam_id: " .. steam_id)
+        return self.players[tostring(steam_id)] -- return the player object if found
     end
     modules.libraries.logging:info("services.player:getPlayer", "Player not found with steam_id: " .. steam_id)
 end
@@ -88,11 +85,10 @@ end
 ---@param peer_id number
 ---@return Player|nil
 function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to use this function, but it is here for compatibility
-    for _, player in pairs(self:getPlayers()) do
-        if modules.libraries.logging.loggingdetail == "full" then
-            modules.libraries.logging:debug("services.player:getPlayerByPeer", "Checking player with peer_id: " .. player.peerId)
-        end
-        if player.peerId == peer_id then
+    if self.peerIdIndex[tostring(peer_id)] ~= nil then
+        modules.libraries.logging:debug("services.player:getPlayerByPeer", "Found steam_id: " .. self.peerIdIndex[tostring(peer_id)] .. " from peer_id: " .. tostring(peer_id))
+        local player = self:getPlayer(self.peerIdIndex[tostring(peer_id)])
+        if player then
             modules.libraries.logging:debug("services.player:getPlayerByPeer", "Found player: " .. player.name .. " from peer_id: " .. player.peerId)
             return player -- return the player object if found
         end
@@ -201,6 +197,7 @@ function modules.services.player:_verifyOnlinePlayers()
 
     for _, player in pairs(server.getPlayers()) do
         onlinePlayers[tostring(player.steam_id)] = true -- mark the player as online
+        self.peerIdIndex[tostring(player.id)] = tostring(player.steam_id) -- map peerId to steamId
     end
 
     for _, player in pairs(self.players) do
