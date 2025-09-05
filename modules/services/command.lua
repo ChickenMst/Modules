@@ -8,7 +8,12 @@ end
 
 function modules.services.command:startService()
     modules.libraries.callbacks:connect("onCustomCommand", function(full_message, peer_id, is_admin, is_auth, command, ...)
+        if peer_id == -1 then return end -- ignore server sending commands
+
         command = self:cleanCommandString(command)
+
+        if not command or command == "" then modules.libraries.logging:info("services.command", "Empty command ignored") return end -- ignore empty commands
+
         args = table.pack(...) -- pack the arguments into a table
         local player = modules.services.player:getPlayerByPeer(peer_id)
         if self.commands[command] then

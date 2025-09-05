@@ -865,7 +865,7 @@ modules.services:createService(name, description, authors) -- create a service
 
 ---@param name string -- name of the service to get
 ---@return Service -- returns the requested service
-modules.services:getService(name) --  get a service from services
+modules.services:getService(name) -- get a service from services
 ```
 Example `createService()` usage:
 ```lua
@@ -876,7 +876,56 @@ function service:initService()
 end
 
 function service:startService()
-    modules.libraries.logging:info("service", "value: "..self.value) -- anyhing you need to run once its started
+    modules.libraries.logging:info("service", "value: "..self.value) -- anything you need to run once its started
 end
 ```
-###
+### modules.services.addon
+This services handles the addons for modules. Addons allow for the extention of functionality for modules or your addon. It allows for drop in addons with no need for changing any internal lua scripts.
+```lua
+modules.services.addon.addons -- table of all the created addons
+
+---@param name string -- name of the addon
+---@param version string|number -- addons version
+---@param description string -- a description of the addon
+---@param authors table<string> -- addons authors
+---@return Addon -- returns Addon class object
+modules.services.addon:createAddon(name, version, description, authors) -- create an addon
+
+---@param name string -- name of the addon to remove
+modules.services.addon:disconnect(name) -- remove an addon from addon service
+
+---@param name string -- name of the addon to enable
+modules.services.addon:enable(name) -- enables an addon (addons are enabled by default)
+
+---@param name string -- name of the addon to disable
+modules.services.addon:disable(name) -- disable an addon (connections and commands are removed when disabled)
+```
+Example `createAddon()` usage:
+```lua
+local addon = modules.services.addon:createAddon("test", 1, "Test Addon", {"ChickenMst"}) -- create the addon via addon service
+
+function addon:initAddon()
+-- anything needed before the addon starts goes here
+end
+
+function addon:startAddon()
+    modules.libraries.logging:info("test", "Test addon started")
+end
+```
+Example `disconnect()` usage:
+```lua
+-- we have made an addon called test
+modules.services.addon:disconnect("test") -- disables the addon and "deletes" it
+```
+Example `disable()` and `enable()`:
+```lua
+-- we have an addon name test that has a `onTick` connection
+modules.services.addon:disable("test") -- disable the addon. its `onTick` connection gets removed
+
+modules.services.addon:enable("test") -- enable the addon. it will run the addons `startAddon()` again
+-- addon is now enabled and running again
+```
+### modules.services.command
+This service handles the custom commands, allowing for things like command aliases permision checks and dynamicly creating and destroying commands.
+```lua
+modules.services.command.commands -- table of the created commands
