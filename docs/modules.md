@@ -911,15 +911,16 @@ end
 function addon:startAddon()
     modules.libraries.logging:info("test", "Test addon started")
 end
+-- look at modules.classes.addon for example with commands and connections
 ```
 Example `disconnect()` usage:
 ```lua
--- we have made an addon called test
+-- assuming you have made an addon named "test"
 modules.services.addon:disconnect("test") -- disables the addon and "deletes" it
 ```
 Example `disable()` and `enable()`:
 ```lua
--- we have an addon name test that has a `onTick` connection
+-- assuming you have an addon named "test" that has a `onTick` connection
 modules.services.addon:disable("test") -- disable the addon. its `onTick` connection gets removed
 
 modules.services.addon:enable("test") -- enable the addon. it will run the addons `startAddon()` again
@@ -929,3 +930,46 @@ modules.services.addon:enable("test") -- enable the addon. it will run the addon
 This service handles the custom commands, allowing for things like command aliases permision checks and dynamicly creating and destroying commands.
 ```lua
 modules.services.command.commands -- table of the created commands
+
+---@param commandstr string -- main command as a string
+---@param alias table<string> -- aliases for the command
+---@param perms table<string> -- permissions required to run the command
+---@param description string -- description of the command
+---@param func fun(player:Player, full_message, command, args, hasPerm) -- function to run when the command is called
+---@return Command -- returns Command class object
+modules.services.command:create(commandstr, alias, perms, description, func) -- create a command
+
+---@param commandstr string -- main command string of the command to enable
+modules.services.command:enable(commandstr) -- enable a command (commands are enabled by default)
+
+---@param commandstr string -- main command string of the command to disable
+modules.services.command:disable(commandstr) -- disables the command so it cant be ran
+
+---@param commandstr string -- main command string of the command to
+modules.services.command:remove(commandstr) -- removes the cpmmand from the command service
+```
+Example `create()` usage:
+```lua
+modules.services.command:create("test",{"t"},{"perm"},"test command", function(player, full_message, command, args, hasPerm) -- create command "test" with alias "t" and permsion "perm"
+    -- do things in here
+
+    -- player is the player who ran the commands Player class
+    -- full_message is the full message eg: "?test arg1"
+    -- command is the actual command that was ran to call the command. good for telling if the player is using an alias
+    -- args is a table full of all the arguments for the command. usage of an argument:
+    local arg1 = args[1] -- sets arg1 to the number 1 argument in the args table
+    -- hasPerm is a boolean for if the player that ran the command has one of the permisions required to run the command
+end)
+```
+Example `disable()` and `enable()` usage:
+```lua
+-- assuming you have already created the command "test"
+modules.services.command:disable("test") -- the command "test" will now not run when called
+
+modules.services.command:enable("test") -- the command "test" can be ran again
+```
+Example `remove()` usage:
+```lua
+-- assuming you have already created the command "test"
+modules.services.command:remove("test") -- this removes the command from the command service in turn destroying it. meaning the command cannot be ran anymore
+```
