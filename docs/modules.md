@@ -973,3 +973,42 @@ Example `remove()` usage:
 -- assuming you have already created the command "test"
 modules.services.command:remove("test") -- this removes the command from the command service in turn destroying it. meaning the command cannot be ran anymore
 ```
+### modules.services.http
+This service handles all of the http requests allowing for easier handling and usage. For this to work it requires extra handleing on the backend side.
+```lua
+modules.services.http.requests -- table of all the HttpRequest class objects for the http requests that have been sent
+
+modules.services.http.groupedRequests -- table to temparaily store request ids to be grouped into one request
+
+modules.services.http.counter -- counter for the request number
+
+modules.services.http.backendPort -- setting for which port the backend is on. can be set via "backendPort" in settings
+
+---@param port number -- port to send the request on
+---@param url string -- the url of the request, eg: "http://localhost:5006/test"
+---@param callback fun(request:HttpRequest, reply: any) | nil -- the function to be run when it gets a response
+---@param groupedRequest boolean -- if it it to be grouped
+---@return HttpRequest|nil -- returns HttpRequest class object
+modules.services.http:get(port, url, callback, groupedRequest) -- send a http request via the backend
+```
+Example normal `get()` usage:
+```lua
+modules.services.http:get(50,"http://localhost:8080/test?value=1",function(request, reply) -- send a http request to be queried by the backend
+    modules.libraries.logging:info("http", "got a response of: "..tostring(reply)) -- log the reply
+end)
+```
+Example grouped `get()` usage:
+```lua
+modules.services.http:get(50,"http://localhost:8080/test?value=1",function(request, reply)
+    modules.libraries.logging:info("http", "got a response of: "..tostring(reply)) -- log the reply
+end, true) -- set it as a grouped request
+
+modules.services.http:get(50,"http://localhost:8080/test?value=2",function(request, reply)
+    modules.libraries.logging:info("http", "got a response of: "..tostring(reply)) -- log the reply
+end, true) -- set it as a grouped request
+
+-- both will be sent in one request on the next tick and will also get a reply at the same time
+```
+### modules.services.loop
+This service handles loops, functions that are run everytime the specifyed period has elapsed.
+```lua
