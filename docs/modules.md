@@ -1010,5 +1010,33 @@ end, true) -- set it as a grouped request
 -- both will be sent in one request on the next tick and will also get a reply at the same time
 ```
 ### modules.services.loop
-This service handles loops, functions that are run everytime the specifyed period has elapsed.
+This service handles loops, functions that are run everytime the specified period has elapsed. this service is only temparay and will more than likely be replaced or removed.
 ```lua
+modules.services.loop.loops -- table of all the created loops
+
+---@param time number -- the wait period in seconds till its next run
+---@param func function -- the function to run
+modules.services.loop:create(time, func) -- create a loop
+
+---@param id number -- the id of the loop you want to remove
+modules.services.loop:remove(id) -- remove/destroy a loop
+```
+Example `create()` usage:
+```lua
+modules.services.loop:create:(1, function() -- create a loop with that runs every second 
+    modules.libraries.logging:info("loop", "1 second has passed")
+end)
+```
+### modules.services.player
+This service handles all of the players, it also stores the Player class objects of the players.
+```lua
+modules.services.player.onJoin -- event for when a player joins. use this to make sure the players class has been made and preped properly
+
+modules.services.player.onLeave -- event for when a player leaves. use this to make sure the players class has been made and preped properly
+
+modules.services.player.onLoad -- event for when the players object has loaded, can be used to tell if a player has joined fully and is ready for ui widgets
+
+modules.services.player.players -- table of Player class objects. indexed via players steam_id
+
+modules.services.player.peerIdIndex -- table of players steam_id indexed to their peer_id for faster searching of players Player class object
+
