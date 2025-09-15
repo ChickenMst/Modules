@@ -1040,3 +1040,133 @@ modules.services.player.players -- table of Player class objects. indexed via pl
 
 modules.services.player.peerIdIndex -- table of players steam_id indexed to their peer_id for faster searching of players Player class object
 
+---@param steam_id string -- steam_id of the Player class object you are trying to get
+---@return Player|nil -- returns Player class object
+modules.services.player:getPlayer(steam_id) -- get a players class object via their steam_id
+
+---@param peer_id number -- the peer_id of the Player class object you are trying to get
+---@return Player|nil -- returns Player class object
+modules.services.player:getPlayerByPeer(peer_id) -- get a player class object via their peer_id
+
+---@return table<string, Player> -- returns a table of all the players (online and not) indexed by their steam_id
+modules.services.player:getPlayers() -- get all of the players (this includes offline players)
+
+---@return table<string, Player> -- returns a table of all the players that are online. indexed by their steam_id
+modules.services.player:getOnlinePlayers() -- all of the players that are currently online
+
+---@param player1 Player -- first player
+---@param player2 Player -- second player
+---@return boolean -- returns boolean of if the players are the same
+modules.services.player:isSamePlayer(player1, player2) -- check if a Player class object is the same as another
+```
+Example `getPlayer()` usage:
+```lua
+local player = modules.services.player:getPlayer("10912804973189") -- get a player via their steam_id
+
+-- returns Player class object, so you can use things like
+player:kick()
+```
+Example `getPlayerByPeer()` usage:
+```lua
+local player = modules.services.player:getPlayerByPeer("2") -- get the player with peer_id of 2. same as `getPlayer()` just using peer_id instead
+```
+Example `getPlayers()` usage:
+```lua
+local players = modules.services.player:getPlayers() -- gets all the players that have been saved by modules
+
+-- you can iterate over the table like this
+for steam_id, player in pairs(players) do
+    modules.libraries.logging:info("players", "player with steam_id: "..steam_id.." exists.")
+end
+
+-- or
+for _, player in pairs(players) do
+    modules.libraries.logging:info("players", "player with steam_id: "..player.steamId.." exists.")
+end
+```
+Example `getOnlinePlayers()` usage:
+```lua
+local players = modules.services.player:getOnlinePlayers() -- returns a table of all the players that are currently online
+
+-- same as `getPlayers()` but with only the players that are actively online / in game
+```
+Example `isSamePlayer()` usage:
+```lua
+local player1 = modules.services.player:getPlayer("21986791321387") -- get the first player with inputed steam_id
+
+local player2 = modules.services.player:getPlayerByPeer("21") -- get the second player with inputer peer_id
+
+local isTheSame = modules.services.player:isSamePlayer(player1, player2) -- checks the steamId's of both player classes to determain if they are the same. returns true if they are the same or false if they are not
+```
+### modules.services.tps
+This service handles calculating and regulating/limiting the tps of the game.
+```lua
+modules.services.tps.targetTPS -- setting for the tps you are trying to get to. can be set via "targetTPS" setting or `setTPS()`
+
+modules.services.tps.tps -- the current tps of the game or server
+
+---@return number -- returns the TPS (ticks per second)
+modules.services.tps:getTPS() -- get the current tps
+
+---@param targetTPS number -- the target tps you would like to set the game to
+modules.services.tps:setTPS(targetTPS) -- sets the target tps for the tps service
+```
+Example `getTPS()` usage:
+```lua
+local tps = modules.services.tps:getTPS() -- returns the servers current tps as a number eg: 54.28760960
+
+-- the value it returns isnt rounded so if you only want to have only to 1 decimal place eg: 30.2 do
+tps = math.floor(tps)
+```
+Example `setTPS()` usage:
+```lua
+-- by default the target tps is set to 0 which is its off state setting it to anything lower that 0 will also set it to 0. setting it above 62.5 (game max tps) does nothing as it cant magicly make the tps go up
+modules.services.tps:setTPS(10) -- this sets the target tps to 10
+
+-- the way the tps the regulating/limiting work is it lags the game until its under the target tps or as close as it can get it. so if you set the target tps to 40 it might end up lagging it until its 39.831 etc, generaly it will be within less than 1 tps of the target
+
+-- slowing down the tps of the game not only slows how fast the physics runs but also how often things like `onTick` are called, so use this service with care
+```
+### modules.services.ui
+This service handles the ui widgets for players. currently the ui widgets dont persist over saves and reloads.
+```lua
+modules.services.ui.widgets -- table of all the created ui widgets
+
+---@param player Player -- the Player class object to search for ui widgets
+---@return table -- returns a table of all widgets that owned by the player
+modules.services.ui:getPlayersWidgets(player) -- get all the ui widgets ownes by a player
+
+---@param player Player -- the Player class object to search for ui widgets
+---@return table -- returns a table of all the ui widgets that are shown to the player
+modules.services.ui:getPlayersShownWidgets(player) -- get all the widgets shown to a player, this includes the ones that are owned by the player aswell
+
+---@param id integer -- the widgets id
+modules.services.ui:removeWidget(id) -- remove/destroy a widget with inputed id
+
+---@param id integer -- the widgets id
+---@return Widget|nil -- returns a widget with that has the inputed id
+modules.services.ui:getWidget(id) -- get a widget by its id
+
+---@param text string -- the text to display in the popup
+---@param x number -- the horizontal position of the popup (default is 0)
+---@param y number -- the vertical position of the popup (default is 0)
+---@param visable boolean -- whether the popup should be visible (default is true)
+---@param player Player|nil -- the player to show the popup to (default is nil, which means all players)
+---@return PopupScreenWidget -- returns the created widget
+modules.services.ui:createPopupScreen(text, x, y, visable, player) -- create a popup screen widget
+```
+Example `getPlayersWidgets()` usage:
+```lua
+local widgets = modules.services.ui:getPlayersWidgets(player) -- gets all the widgets owned by the player eg the players player class object was used to make them
+
+-- the table that is returned isnt index by the widgets id, so if you want to find a specific widget via this you will have to make your own custom handling
+```
+Example `getPlayersShownWidgets()` usage:
+```lua
+local widgets = modules.services.ui:getPlayersShownWidgets(player) -- gets all the widgets shown to the player, this includes widgets that are shown to all players and also the widgets owned by the player
+
+-- the table that is returned isnt index by the widgets id, so if you want to find a specific widget via this you will have to make your own custom handling
+```
+Example `removeWidget()` usage:
+```lua
+modules.services.ui:removeWidget(id) -- by removing a widget via its id it is removed from all shown players and then destroyed

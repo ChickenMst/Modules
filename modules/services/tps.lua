@@ -5,7 +5,7 @@
 modules.services.tps = modules.services:createService("tps", "Service for calculating and managing tps", {"ChickenMst"})
 
 function modules.services.tps:initService()
-    self.targetTPS = modules.libraries.settings:getValue("targetTps",true,0) -- target TPS (ticks per second)
+    self.targetTPS = modules.libraries.settings:getValue("targetTPS",true,0) -- target TPS (ticks per second)
     self.tps = 0 -- current TPS (ticks per second)
     self._last = server.getTimeMillisec() -- last tick time in milliseconds
 end

@@ -84,7 +84,7 @@ end
 -- get a player by their peer_id
 ---@param peer_id number
 ---@return Player|nil
-function modules.services.player:getPlayerByPeer(peer_id) -- not recommended to use this function, but it is here for compatibility
+function modules.services.player:getPlayerByPeer(peer_id)
     if self.peerIdIndex[tostring(peer_id)] ~= nil then
         modules.libraries.logging:debug("services.player:getPlayerByPeer", "Found steam_id: " .. self.peerIdIndex[tostring(peer_id)] .. " from peer_id: " .. tostring(peer_id))
         local player = self:getPlayer(self.peerIdIndex[tostring(peer_id)])
