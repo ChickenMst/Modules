@@ -526,8 +526,10 @@ vehicle.id -- the vehicles vehicle_id
 
 vehicle.groupId -- the vehicles group_id
 
+---@param vehicle Vehicle -- passes itself as a parameter
 vehicle.onDespawn -- event for when the vehicle is despawned
 
+---@param vehicle Vehicle -- passes itself as a parameter
 vehicle.onLoaded -- event for when the vehicle has been loaded
 
 vehicle.isLoaded -- if the vehicle is loaded or not
@@ -558,8 +560,10 @@ vehicleGroup.owner -- player that owns the vehicle group
 
 vehicleGroup.spawnTime -- time the vehicle was spawned
 
+---@param vehicleGroup VehicleGroup -- passes itself as a parameter
 vehicleGroup.onDespawn -- event for when the vehicle group is despawned
 
+---@param vehicleGroup VehicleGroup -- passes itself as a parameter
 vehicleGroup.onLoaded -- event for when the vehicle group is loaded
 
 vehicleGroup.isLoaded -- if the vehicle group is loaded
@@ -1030,10 +1034,13 @@ end)
 ### modules.services.player
 This service handles all of the players, it also stores the Player class objects of the players.
 ```lua
+---@param player Player -- Player class object of the player that joined
 modules.services.player.onJoin -- event for when a player joins. use this to make sure the players class has been made and preped properly
 
+---@param player Player -- Player class object of the player that left
 modules.services.player.onLeave -- event for when a player leaves. use this to make sure the players class has been made and preped properly
 
+---@param player Player -- Player class object of the player that loaded
 modules.services.player.onLoad -- event for when the players object has loaded, can be used to tell if a player has joined fully and is ready for ui widgets
 
 modules.services.player.players -- table of Player class objects. indexed via players steam_id
@@ -1170,3 +1177,54 @@ local widgets = modules.services.ui:getPlayersShownWidgets(player) -- gets all t
 Example `removeWidget()` usage:
 ```lua
 modules.services.ui:removeWidget(id) -- by removing a widget via its id it is removed from all shown players and then destroyed
+```
+Example `getWidget()` usage:
+```lua
+local widget = modules.services.ui:getWidget(id) -- returns the widget class object corosponding with the inputed id
+```
+Example `createPopupScreen()` usage:
+```lua
+local widget = modules.services.ui:createPopupScreen("this is text on a popup screen ui element", 0.5, 0, true) -- create a popup screen widget for everyone
+
+
+local player = modules.service.player:getPlayer("9887961374179373") -- get a Player class object
+
+local widget = modules.services.ui:createPopupScreen("this is text on a popup screen ui element", 0.5, 0, true, player) -- create a widget "owned" by inputed player
+
+
+local widget = modules.services.ui:createPopupScreen("this is text on a popup screen ui element") -- this is the minimal amount of aguments you can do with it still having text (the defaults are "",0,0,true,nil)
+```
+### modules.services.vehicle
+This service handles the tracking of players vehicles. it provides events that can be connected into for all of the stages of a vehicle spawning.
+```lua
+modules.services.vehicle.loadingVehicles -- table of VehicleGroup class objects that are currently being loaded
+
+modules.services.vehicle.loadedVehicles -- table of VehicleGroup class objects that have been loaded
+
+---@param vGroup VehicleGroup -- the vehicle group of the vehicle that was spawned
+---@param vehcile_id number -- vehicle_id of the vehicle that was spawned
+modules.services.vehicle.onVehicleSpawn -- event for when a vehicle is spawned
+
+---@param vGroup VehicleGroup -- the vehicle group of the vehicle that was loaded
+---@param vehcile_id number -- vehicle_id of the vehicle that was loaded
+modules.services.vehicle.onVehicleLoad -- event for when a vehicle has loaded
+
+---@param vGroup VehicleGroup -- the vehicle group of the vehicle that was despawned
+---@param vehcile_id number -- vehicle_id of the vehicle that was despawned
+modules.services.vehicle.onVehicleDespawn -- event for when a vehicle is despawned
+
+---@param vGroup VehicleGroup -- the vehicle group that was loaded
+modules.services.vehicle.onGroupLoad -- event for when a vehicle group has fully loaded
+
+---@param vGroup VehicleGroup -- the vehicle group that was despawned
+modules.services.vehicle.onGroupDespawn -- event for when a vehicle group has been despawned
+
+---@param vehicle_id number -- the vehicle_id of one of vehicles in a group that you are trying to find
+---@param mustBeLoaded boolean|nil -- if the vehicle group needs to be loaded
+---@return VehicleGroup|nil -- returns VehicleGroup class object that contains the specifyed vehicle_id
+modules.services.vehicle:getVehicleGroup(vehicle_id, mustBeLoaded) -- get the vehicle group of the vehicle that belongs to the inputed vehicle_id
+```
+Example `getVehicleGroup()` usage:
+```lua
+local vehicleGroup = modules.services.vehicle:getVehicleGroup(10, true) -- gets the vehicle group that the vehicle with the vehicle_id of 10 belongs to
+```
