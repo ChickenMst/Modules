@@ -32,7 +32,7 @@ function modules.services.vehicle:startService()
             vGroup:addVehicle(vehicle)
         end
 
-        if modules.libraries.logging.loggingdetail == "full" then
+        if modules.libraries.logging.loggingDetail == "full" then
             modules.libraries.logging:debug("onVehicleSpawn", "Vehicle spawned with id: " .. vehicle_id .. ", group id: " .. group_id)
         end
         self.loadingVehicles[group_id] = vGroup
@@ -74,7 +74,7 @@ function modules.services.vehicle:startService()
         end
 
         if vGroup.vehicles[vehicle_id] then
-            if modules.libraries.logging.loggingdetail == "full" then
+            if modules.libraries.logging.loggingDetail == "full" then
                 modules.libraries.logging:debug("onVehicleDespawn", "Vehicle despawned with id: " .. vehicle_id .. ", group id: " .. vGroup.groupId)
             end
             vGroup.vehicles[vehicle_id]:despawned()

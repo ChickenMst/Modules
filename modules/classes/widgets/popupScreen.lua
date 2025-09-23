@@ -14,7 +14,7 @@ function modules.classes.widgets.popupScreen:create(id, visible, text, x, y, pla
         _class = "PopupScreenWidget",
         player = player,
         id = id,
-        visible = visible or false,
+        visible = visible or true,
         text = text or "",
         x = x or 0, -- Default horizontal position
         y = y or 0, -- Default vertical position
