@@ -21,7 +21,7 @@ This table stores all the UI widget builders. Like `modules.classes` it doesnt h
 This class is for the `PopupScreen` widget aswell as functions to interact with it. Although you can create an object directly from the class it is recomended to use the UI service `modules.services.ui:createPopupScreen()`.
 ```lua
 ---@param id integer -- the ui_id of the widget
----@param visable boolean -- if the PopupScreen widget is visable on the players screen
+---@param visable boolean -- if the PopupScreen widget is visible on the players screen
 ---@param text string -- the text for the PopupScreen widget
 ---@param x integer -- the x pos on the players screen. range from 1 to -1
 ---@param y integer -- the y pos on the players screen. range from 1 to -1
