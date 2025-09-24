@@ -190,6 +190,6 @@ function modules.services.http:_load(load)
         self.counter = math.floor((loaded and loaded.counter or self.counter))
         modules.libraries.logging:debug("http:_load()", "HTTP service loaded with " .. #self.requests .. " requests")
     elseif loaded and load then
-        self.counter = math.floor(loaded.counter) or self.counter
+        self.counter = math.floor((loaded and loaded.counter or self.counter))
     end
 end
