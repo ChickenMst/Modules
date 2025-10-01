@@ -110,6 +110,11 @@ modules.onStart:once(function()
 			end
 		end, true)
 	end)
+
+	modules.services.command:create("test", {}, {}, "test command", function (player, full_message, command, args, hasPerm)
+		local vgs = modules.services.vehicle:getPlayersVehicleGroups(player)
+		modules.libraries.logging:info("test", "Player vehicle groups: " .. modules.libraries.table:tostring(vgs))
+	end)
 end)
 
 modules.onStart:once(function()

@@ -473,6 +473,11 @@ player:teleport(pos) -- teleports player to the inputed matrix
 
 ---@return table -- matrix table
 player:getPos() -- returns the players position as matrix
+
+---@param title string -- title of the notification
+---@param message string -- message of the notification
+---@param notificationType number -- notification type
+function player:notify(title, message, notificationType) -- send a notification to the player
 ```
 ### modules.classes.service
 This class represents a service in `modules`. allows for the service to be initalised and then started. must be called via `modules.services:createService()` to be initalised and started automaticly by modules.
