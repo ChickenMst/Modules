@@ -118,6 +118,9 @@ function modules.services.vehicle:getVehicleGroup(vehicle_id, mustBeLoaded)
     return g
 end
 
+-- get all vehicle groups owned by a player
+---@param player Player
+---@return table<number, VehicleGroup>
 function modules.services.vehicle:getPlayersVehicleGroups(player)
     local groups = {}
     for _, vGroup in pairs(self.loadedVehicles) do

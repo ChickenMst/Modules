@@ -1228,6 +1228,10 @@ modules.services.vehicle.onGroupDespawn -- event for when a vehicle group has be
 ---@param mustBeLoaded boolean|nil -- if the vehicle group needs to be loaded
 ---@return VehicleGroup|nil -- returns VehicleGroup class object that contains the specifyed vehicle_id
 modules.services.vehicle:getVehicleGroup(vehicle_id, mustBeLoaded) -- get the vehicle group of the vehicle that belongs to the inputed vehicle_id
+
+---@param player Player -- player to check for vehicles
+---@return table<number, VehicleGroup> -- table of VehicleGroup class objects indexed by group_id
+modules.services.vehicle:getPlayersVehicleGroups(player) -- get all vehicle groups owned by a player
 ```
 Example `getVehicleGroup()` usage:
 ```lua
