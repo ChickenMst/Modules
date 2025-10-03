@@ -1,7 +1,7 @@
 ---@class vehicleService: Service
 ---@field loadingVehicles table<number, VehicleGroup> -- table of vehicles that are being loaded
 ---@field loadedVehicles table<number, VehicleGroup> -- table of vehicles that are loaded
-modules.services.vehicle = modules.services:createService("vehicles", "Handles vehicle spawning, loading, and despawning.", {"ChickenMst"})
+modules.services.vehicle = modules.services:createService("vehicle", "Handles vehicle spawning, loading, and despawning.", {"ChickenMst"})
 
 function modules.services.vehicle:initService()
     self.loadingVehicles = {}
@@ -138,15 +138,15 @@ end
 
 -- internal function to save the vehicles service
 function modules.services.vehicle:_save()
-    modules.libraries.gsave:saveService("vehicles", self)
+    modules.libraries.gsave:saveService("vehicle", self)
 end
 
 -- internal function to load the saved vehicles from gsave
 function modules.services.vehicle:_load()
-    local service = modules.libraries.gsave:loadService("vehicles")
+    local service = modules.libraries.gsave:loadService("vehicle")
 
     if not service then
-        modules.libraries.logging:warning("vehicles:_load", "Skiped loading vehicles service, no data found.")
+        modules.libraries.logging:warning("vehicle:_load", "Skiped loading vehicles service, no data found.")
         return
     end
 

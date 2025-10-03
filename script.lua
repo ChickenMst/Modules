@@ -111,9 +111,25 @@ modules.onStart:once(function()
 		end, true)
 	end)
 
-	modules.services.command:create("test", {}, {}, "test command", function (player, full_message, command, args, hasPerm)
-		local vgs = modules.services.vehicle:getPlayersVehicleGroups(player)
-		modules.libraries.logging:info("test", "Player vehicle groups: " .. modules.libraries.table:tostring(vgs))
+	modules.services.command:create("ui", {}, {}, "test command", function (player, full_message, command, args, hasPerm)
+		if args[1] == "clear" then
+			local widgets = modules.services.ui:getPlayersShownWidgets(player)
+			for _, widget in pairs(widgets) do
+				widget:destroy()
+				modules.services.ui:removeWidget(widget.id)
+			end
+			return
+		elseif args[1] == "list" then
+			local widgets = modules.services.ui:getPlayersShownWidgets(player)
+			local str = "Widgets:\n"
+			for _, widget in pairs(widgets) do
+				str = str .. "ID: " .. widget.id .. ", Type: " .. widget.type .. ", Player: " .. (widget.player and widget.player.name or "Nil") .. "\n"
+			end
+			modules.libraries.logging:info("ui", str)
+			return
+		elseif args[1] == "create" then
+			modules.services.ui:createPopup(args[2], args[3], args[4], args[5])
+		end
 	end)
 end)
 
