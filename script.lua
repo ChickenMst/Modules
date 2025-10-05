@@ -128,7 +128,7 @@ modules.onStart:once(function()
 			modules.libraries.logging:info("ui", str)
 			return
 		elseif args[1] == "create" then
-			modules.services.ui:createPopup(args[2], args[3], args[4], args[5])
+			modules.services.ui:createMapObject(args[2], args[3], modules.classes.widgets.color:create(100,100,100,255), 1, 0, 1000, 1000, args[4], player)
 		end
 	end)
 end)

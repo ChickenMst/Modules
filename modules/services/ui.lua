@@ -129,6 +129,28 @@ function modules.services.ui:createPopup(text, x, y, z, renderDistance, visable,
     return widget
 end
 
+-- creates a map object widget
+---@param label string|nil The label to display on the map
+---@param hoverLabel string|nil The label to display when hovering over the map object
+---@param color Color|nil The color of the map object
+---@param posType integer|nil The position type (0 for world position, 1 for relative to vehicle, 2 for relative to object)
+---@param markerType integer|nil The type of marker to display
+---@param x number|nil The x position in the world or relitive to the parent
+---@param z number|nil The z position in the world or relitive to the parent
+---@param parentId integer|nil The ID of the parent object or vehicle
+---@param player Player|nil The player to show the map object to (default is nil, which means all players)
+---@param radius number|nil The radius of the map object (default is 0)
+function modules.services.ui:createMapObject(label, hoverLabel, color, posType, markerType, x, z, parentId, player, radius)
+    local id = server.getMapID()
+    local widget = modules.classes.widgets.mapObject:create(id, label, hoverLabel, color, posType, markerType, x, z, parentId, player, radius)
+
+    widget:update()
+    self:_addWidget(widget)
+    self:_save()
+
+    return widget
+end
+
 function modules.services.ui:_save()
     modules.libraries.gsave:saveService("ui", self)
 end
@@ -139,7 +161,10 @@ function modules.services.ui:_load()
             return modules.classes.widgets.popupScreen:create(math.floor(widget.id), widget.visible, widget.text, widget.x, widget.y, widget.player)
         end,
         ["popup"] = function(widget)
-            return modules.classes.widgets.popup:create(math.floor(widget.id), widget.visible, widget.text, widget.x, widget.y, widget.z, widget.player, widget.renderDistance, widget.vehicleParent, math.floor(widget.objectParent))
+            return modules.classes.widgets.popup:create(math.floor(widget.id), widget.visible, widget.text, widget.x, widget.y, widget.z, widget.player, widget.renderDistance, widget.vehicleParent, widget.objectParent)
+        end,
+        ["mapObject"] = function(widget)
+            return modules.classes.widgets.mapObject:create(math.floor(widget.id), widget.label, widget.hoverLabel, widget.color, widget.posType, widget.markerType, widget.x, widget.z, widget.parentId, widget.player, widget.radius)
         end,
     } -- table of functions to rebuild widgets mapped by widget type
     local service = modules.libraries.gsave:loadService("ui")
