@@ -14,7 +14,7 @@ function modules.classes.widgets.mapObject:create(id, label, hoverLabel, color, 
     ---@field x number
     ---@field z number
     ---@field radius number
-    ---@field parentId integer
+    ---@field parentId number
     local map = {
         _class = "MapObjectWidget",
         type = "mapObject",
@@ -34,7 +34,7 @@ function modules.classes.widgets.mapObject:create(id, label, hoverLabel, color, 
     -- update the ui object for the player
     ---@param player Player
     function map:_update(player)
-        server.addMapObject(player.peerId, self.id, self.posType, self.markerType, self.x, self.z, self.x, self.z, self.parentId, self.parentId, self.label, self.radius, self.hoverLabel, self.color.r, self.color.g, self.color.b, self.color.a)
+        server.addMapObject(player.peerId, self.id, self.posType, self.markerType, self.x, self.z, self.x, self.z, (self.posType == 1 and self.parentId or 0), (self.posType == 2 and self.parentId or 0), self.label, self.radius, self.hoverLabel, self.color.r, self.color.g, self.color.b, self.color.a)
     end
 
     -- remove the ui object from the player
