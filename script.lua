@@ -102,7 +102,7 @@ modules.onStart:once(function()
 				modules.libraries.logging:error("httptest", "No reply received")
 			end
 		end, true)
-		modules.services.http:get("http://localhost:8080/api/server/30/?action=kill", function(request, reply)
+		modules.services.http:get("http://localhost:8080/api/server/30/?action=stop", function(request, reply)
 			if type(reply) == "table" then
 				modules.libraries.logging:debug("httptest", "Received reply: " .. modules.libraries.table:tostring(reply))
 			else
