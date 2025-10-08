@@ -106,7 +106,7 @@ modules.onStart:once(function()
 			if type(reply) == "table" then
 				modules.libraries.logging:debug("httptest", "Received reply: " .. modules.libraries.table:tostring(reply))
 			else
-				modules.libraries.logging:error("httptest", "No reply received")
+				modules.libraries.logging:error("httptest", reply)
 			end
 		end, true)
 	end)
