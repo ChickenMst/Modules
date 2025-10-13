@@ -15,7 +15,7 @@ function modules.services.vehicle:initService()
 end
 
 function modules.services.vehicle:startService()
-    if modules.addonReason == "reload" then
+    if modules.addonReason ~= "create" then
         self:_load() -- load the service on creation
     end
 
@@ -168,7 +168,7 @@ function modules.services.vehicle:_load()
         for _,vGroup in pairs(service.loadedVehicles) do
             local rebuiltGroup = modules.classes.vehicleGroup:create(vGroup.groupId, modules.services.player:getPlayer(vGroup.owner.steamId), vGroup.spawnTime, vGroup.isLoaded)
             for _, vehicle in pairs(vGroup.vehicles) do
-                local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.groupId, vehicle.isLoaded)
+                local rebuiltVehicle = modules.classes.vehicle:create(vehicle.id, vGroup.groupId, vehicle.isLoaded, vehicle.data, vehicle.info)
                 rebuiltGroup:addVehicle(rebuiltVehicle)
             end
             rebuilt[rebuiltGroup.groupId] = rebuiltGroup

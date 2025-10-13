@@ -131,6 +131,14 @@ modules.onStart:once(function()
 			modules.services.ui:createMapObject(args[2], args[3], modules.classes.widgets.color:create(100,100,100,255), 1, 0, 1000, 1000, args[4], player)
 		end
 	end)
+
+	modules.services.command:create("test", {}, {}, "test command", function (player, full_message, command, args, hasPerm)
+		local vehicles = modules.services.vehicle:getPlayersVehicleGroups(player)
+
+		for _, group in pairs(vehicles) do
+			modules.libraries.logging:info("test", modules.libraries.table:tostring(group:getInfo(true)))
+		end
+	end)
 end)
 
 modules.onStart:once(function()
