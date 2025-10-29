@@ -65,7 +65,7 @@ function modules.services.ui:removeWidget(id)
     local widget = self:getWidget(id)
 
     if not widget then
-        modules.libraries.logging:warning("services.ui", "Widget with ID " .. id .. " does not exist")
+        modules.libraries.logging:warning("services.ui", "Widget with ID '%s' does not exist", id)
         return
     end
 
@@ -181,7 +181,7 @@ function modules.services.ui:_load()
                 self:_addWidget(rebuiltWidget)
                 rebuiltWidget:update()
             else
-                modules.libraries.logging:warning("ui:_load", "Unknown widget type: " .. tostring(widget.type))
+                modules.libraries.logging:warning("ui:_load", "Unknown widget type: '%s'", tostring(widget.type))
             end
         end
     end
