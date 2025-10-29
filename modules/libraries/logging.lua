@@ -18,6 +18,7 @@ modules.libraries.logging.loggingMode = modules.libraries.settings:getValue("log
 ---@param logtype number
 ---@param title string
 ---@param message string
+---@param ... any
 function modules.libraries.logging:log(logtype, title, message, ...)
     local bundledlog = self:_bundleLog(self:_logLevelToString(logtype), title, message, ...) -- bundle the log into a table for easy access
     local formattedlog = self:_formatLog(bundledlog) -- format the log into a string for easy access
@@ -37,6 +38,7 @@ end
 ---@param logtype string
 ---@param title string
 ---@param message string
+---@param ... any
 ---@return table log
 function modules.libraries.logging:_bundleLog(logtype, title, message, ...)
     local log = {}
@@ -91,24 +93,28 @@ end
 
 ---@param title string
 ---@param message string
+---@param ... any
 function modules.libraries.logging:error(title, message, ...)
     self:log(self.logTypes.ERROR, title, message, ...)
 end
 
 ---@param title string
 ---@param message string
+---@param ... any
 function modules.libraries.logging:warning(title, message, ...)
     self:log(self.logTypes.WARNING, title, message, ...)
 end
 
 ---@param title string
 ---@param message string
+---@param ... any
 function modules.libraries.logging:info(title, message, ...)
     self:log(self.logTypes.INFO, title, message, ...)
 end
 
 ---@param title string
 ---@param message string
+---@param ... any
 function modules.libraries.logging:debug(title, message, ...)
     self:log(self.logTypes.DEBUG, title, message, ...)
 end
