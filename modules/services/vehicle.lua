@@ -176,3 +176,13 @@ function modules.services.vehicle:_load()
         self.loadedVehicles = rebuilt
     end
 end
+
+---@param vehicle VehicleGroup
+function modules.services.vehicle:_updateVehicle(vehicle)
+    if self.loadedVehicles[vehicle.groupId] then
+        self.loadedVehicles[vehicle.groupId] = vehicle
+    elseif self.loadingVehicles[vehicle.groupId] then
+        self.loadingVehicles[vehicle.groupId] = vehicle
+    end
+    self:_save()
+end

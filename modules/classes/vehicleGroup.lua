@@ -40,9 +40,7 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
     -- adds a vehicle to the vehicle group
     ---@param vehicle Vehicle
     function vehicleGroup:addVehicle(vehicle)
-        if not self.vehicles[vehicle.id] then
-            self.vehicles[vehicle.id] = vehicle
-        end
+        self.vehicles[vehicle.id] = vehicle
     end
 
     function vehicleGroup:setEditable(state)
@@ -99,7 +97,7 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
     end
 
     function vehicleGroup:save()
-        modules.services.vehicle:_save()
+        modules.services.vehicle:_updateVehicle(self)
     end
 
     return vehicleGroup

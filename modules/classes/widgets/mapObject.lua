@@ -68,7 +68,7 @@ function modules.classes.widgets.mapObject:create(id, label, hoverLabel, color, 
     end
 
     function map:save()
-        modules.services.ui:_save()
+        modules.services.ui:_addWidget(self)
     end
 
     return map

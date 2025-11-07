@@ -66,7 +66,7 @@ function modules.classes.widgets.popup:create(id, visible, text, x, y, z, player
     end
 
     function popup:save()
-        modules.services.ui:_save()
+        modules.services.ui:_addWidget(self)
     end
 
     return popup
