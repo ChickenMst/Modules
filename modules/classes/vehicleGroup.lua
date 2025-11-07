@@ -11,7 +11,7 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
         _class = "VehicleGroup",
         groupId = tostring(group_id),
         vehicles = {}, ---@type Vehicle[]
-        owner = owner,
+        ownerId = owner and owner.steamId,
         spawnTime = spawnTime or server.getTimeMillisec(),
         onDespawn = modules.libraries.event:create(),
         onLoaded = modules.libraries.event:create(),
@@ -34,7 +34,12 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
     -- sets the vehicle groups owner
     ---@param newowner Player
     function vehicleGroup:setOwner(newowner)
-        self.owner = newowner
+        self.ownerId = newowner.steamId
+    end
+
+    ---@return Player|nil
+    function vehicleGroup:getOwner()
+        return modules.services.player:getPlayer(self.ownerId)
     end
 
     -- adds a vehicle to the vehicle group
