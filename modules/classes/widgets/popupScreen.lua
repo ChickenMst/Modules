@@ -57,5 +57,9 @@ function modules.classes.widgets.popupScreen:create(id, visible, text, x, y, pla
         end
     end
 
+    function screen:save()
+        modules.services.ui:_save()
+    end
+
     return screen
 end

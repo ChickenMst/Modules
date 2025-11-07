@@ -149,6 +149,6 @@ modules.onStart:once(function()
 	elseif modules.addonReason == "load" then
 		modules.libraries.logging:info("onCreate()", "World loaded")
 	else
-		modules.libraries.logging:info("onCreate()", "Unknown world state: " .. tostring(modules.addonReason))
+		modules.libraries.logging:info("onCreate()", "Unknown world state: %s", tostring(modules.addonReason))
 	end
 end)
