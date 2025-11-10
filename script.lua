@@ -133,11 +133,11 @@ modules.onStart:once(function()
 	end)
 
 	modules.services.command:create("test", {}, {}, "test command", function (player, full_message, command, args, hasPerm)
-		local vehicles = modules.services.vehicle:getPlayersVehicleGroups(player)
-
-		for _, group in pairs(vehicles) do
-			modules.libraries.logging:info("test", modules.libraries.table:tostring(group:getInfo(true)))
-		end
+		modules.services.task:create(60, function(task)
+			task:setPeriod(task.period + 60)
+			task:update()
+			modules.libraries.logging:info("test", "Task: %s executed for player: %s", task.id, (player and player.name or "Nil"))
+		end, true)
 	end)
 end)
 
