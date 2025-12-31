@@ -1754,7 +1754,7 @@ local vehicleGroup = modules.services.vehicle:getVehicleGroup(10, true) -- gets 
 Example `getPlayersVehicleGroups()` usage:
 
 ```lua
-    local player = modules.services.player:getPlayerByPeer(1) -- get player with peerId of 1
+local player = modules.services.player:getPlayerByPeer(1) -- get player with peerId of 1
 
-    local vehicleGroups = modules.services.vehicle:getPlayersVehicleGroups(player, true) -- get a tabel of all the vehicle groups that are owned by the player and are loaded
+local vehicleGroups = modules.services.vehicle:getPlayersVehicleGroups(player, true) -- get a tabel of all the vehicle groups that are owned by the player and are loaded
 ```
