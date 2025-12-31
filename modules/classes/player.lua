@@ -63,6 +63,7 @@ function modules.classes.player:create(peerId, steamId, name, admin, auth, objec
 
     -- returns a specific extra value for the player
     ---@param key string|number
+    ---@return any
     function player:getExtra(key)
         if not self.extra then
             return nil
@@ -126,7 +127,7 @@ function modules.classes.player:create(peerId, steamId, name, admin, auth, objec
 
     -- teleports the player to a specific position
     ---@param pos table
-    function player:teleport(pos)
+    function player:setPos(pos)
         server.setPlayerPos(self.peerId, pos)
     end
 
