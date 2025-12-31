@@ -5,6 +5,7 @@ modules.classes.player = {} -- table of player functions
 ---@param name string|nil
 ---@param admin boolean|nil
 ---@param auth boolean|nil
+---@param objectId integer|nil
 ---@param perms table|nil
 ---@param extra table|nil
 ---@return Player

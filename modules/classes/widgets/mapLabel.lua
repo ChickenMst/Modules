@@ -9,6 +9,7 @@ function modules.classes.widgets.mapLabel:create(id, text, labelType, x, z, play
     ---@field labelType integer
     ---@field x number
     ---@field z number
+    ---@field name string
     local label = {
         _class = "MapLabelWidget",
         type = "mapLabel",
