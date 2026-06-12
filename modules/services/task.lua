@@ -13,13 +13,22 @@ function modules.services.task:startService()
     end)
 end
 
-function modules.services.task:create(period, func, repeating)
+-- creates a new task
+---@param period number time in seconds or ticks between each execution of the task
+---@param func function the function to execute when the task runs
+---@param repeating boolean whether the task should repeat
+---@param useTime boolean whether to use time-based execution
+function modules.services.task:create(period, func, repeating, useTime)
     local id = #self.tasks + 1
-    local task = modules.classes.task:create(id, period, repeating, func)
+    local task = modules.classes.task:create(id, period, repeating, func, useTime)
     self.tasks[id] = task
     return task
 end
 
 function modules.services.task:_updateTask(task)
     self.tasks[task.id] = task
+end
+
+function modules.services.task:remove(task)
+    self.tasks[task.id] = nil
 end

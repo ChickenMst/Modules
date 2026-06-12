@@ -6,18 +6,29 @@ function modules.services.player:initService()
     self.onJoin = modules.libraries.event:create()
     self.onLeave = modules.libraries.event:create()
     self.onLoad = modules.libraries.event:create() -- doesnt work in singleplayer
+    self.onItemDrop = modules.libraries.event:create()
+    self.onRespawn = modules.libraries.event:create()
 
     self.players = {}
     self.peerIdIndex = {} -- used to convert peerId to steamId
+    self.onlinePlayersIndex = {} -- used to track which players are currently in-game, maps steamId
 end
 
 
 function modules.services.player:startService()
     if modules.addonReason ~= "create" then
         self:_load() -- load the player service on creationTime
+    else
+        self:_verifyPlayerClasses()
+        self:_verifyOnlinePlayers()
+        self:_save()
     end
 
     modules.libraries.callbacks:connect("onPlayerJoin", function(steam_id, name, peer_id, is_admin, is_auth)
+        if not steam_id or steam_id == 0 then
+            return -- skip if steam_id is nil or 0
+        end
+
         name = self:_cleanName(name)
         modules.libraries.logging:debug("onPlayerJoin", "Player joined with steam_id: '%s', name: '%s', peer_id: '%s'", steam_id, name, peer_id)
         local player = self:getPlayer(tostring(steam_id))
@@ -32,8 +43,10 @@ function modules.services.player:startService()
 
         player.inGame = true -- set the player as in-game
         player.peerId = peer_id -- update the peer_id
+        player.objectId = nil -- reset the objectId on join, will be set on load
         self.players[tostring(steam_id)] = player -- add the player to the table
         self.peerIdIndex[tostring(peer_id)] = tostring(steam_id) -- map peerId to steamId
+        self.onlinePlayersIndex[tostring(steam_id)] = true -- mark the player as online
         self:_save() -- save the player service
         self.onJoin:fire(player) -- fire the event
     end)
@@ -53,6 +66,7 @@ function modules.services.player:startService()
             player.inGame = false -- set the player as not in-game
             self.onLeave:fire(player) -- fire the event
             self.players[tostring(steam_id)] = player
+            self.onlinePlayersIndex[tostring(steam_id)] = nil -- mark the player as offline
             self:_save() -- save the player service
         end
     end)
@@ -68,6 +82,24 @@ function modules.services.player:startService()
                 self:_save() -- save the player service
                 self.onLoad:fire(player) -- fire the event
             end
+        end
+    end)
+
+    modules.libraries.callbacks:connect("onEquipmentDrop", function (playerObjectId, itemObjectId, item)
+        local players = self:getOnlinePlayers()
+
+        for _, player in pairs(players) do
+            if player.objectId == playerObjectId then
+                self.onItemDrop:fire(player, itemObjectId, item)
+                break
+            end
+        end
+    end)
+
+    modules.libraries.callbacks:connect("onPlayerRespawn", function (peer_id)
+        local player = self:getPlayerByPeer(peer_id)
+        if player then
+            self.onRespawn:fire(player)
         end
     end)
 end
@@ -107,9 +139,10 @@ end
 ---@return table<string, Player>
 function modules.services.player:getOnlinePlayers() -- returns a table of players that are currently in-game
     local onlinePlayers = {}
-    for _, player in pairs(self:getPlayers()) do
-        if player.inGame then
-            onlinePlayers[tostring(player.steamId)] = player -- add the player to the table if they are in-game
+    for steamId, _ in pairs(self.onlinePlayersIndex) do
+        local player = self:getPlayer(steamId)
+        if player then
+            onlinePlayers[tostring(steamId)] = player
         end
     end
     return onlinePlayers -- return the list of online players
@@ -148,7 +181,8 @@ function modules.services.player:_load()
                 playerData.auth,
                 playerData.objectId,
                 playerData.perms,
-                playerData.extra
+                playerData.extra,
+                playerData.data
             )
             if not player then
                 modules.libraries.logging:warning("services.player:_load", "Failed to create player class for steam_id: '%s'", playerData.steam_id)
@@ -162,9 +196,38 @@ function modules.services.player:_load()
 
     self:_verifyOnlinePlayers() -- verify online players after loading
 
+    self:_verifyPlayerClasses() -- verify player classes after loading
+    modules.services.player:_save() -- save the player service after loading
+end
+
+-- internal function to save the players to gsave
+function modules.services.player:_save()
+    modules.libraries.gsave:saveService("player", self)
+end
+
+-- internal function to verify if the players are online
+function modules.services.player:_verifyOnlinePlayers()
+    self.onlinePlayersIndex = {}
+
+    for _, player in pairs(server.getPlayers()) do
+        self.onlinePlayersIndex[tostring(player.steam_id)] = true -- mark the player as online
+        self.peerIdIndex[tostring(player.id)] = tostring(player.steam_id) -- map peerId to steamId
+    end
+
+    for _, player in pairs(self.players) do
+        player.inGame = self.onlinePlayersIndex[tostring(player.steamId)] ~= nil -- set inGame based on onlinePlayers
+        if not player.inGame and modules.addonReason == "load" then
+            player.peerId = -1
+        elseif not player.inGame and player.peerId ~= -1 then
+            self.peerIdIndex[tostring(player.peerId)] = tostring(player.steamId) -- add offline but not old save players to peerIdIndex
+        end
+    end
+end
+
+function modules.services.player:_verifyPlayerClasses()
     for _, player in pairs(server.getPlayers()) do
         if player.steam_id == 0 then
-            modules.libraries.logging:debug("services.player:_load", "Skiped loading player: '%s'", player.name)
+            modules.libraries.logging:debug("services.player:_verifyPlayerClasses", "Skiped loading player: '%s'", player.name)
             goto continue -- skip players with steam_id 0
         end
         local existingPlayer = self:getPlayer(tostring(player.steam_id))
@@ -179,38 +242,13 @@ function modules.services.player:_load()
             )
             if newPlayer then
                 self.players[tostring(player.steam_id)] = newPlayer -- add the player to the table
-                modules.libraries.logging:debug("services.player:_load", "Created player class for player: '%s' with steam_id: '%s'", newPlayer.name, newPlayer.steamId)
+                modules.libraries.logging:debug("services.player:_verifyPlayerClasses", "Created player class for player: '%s' with steam_id: '%s'", newPlayer.name, newPlayer.steamId)
                 modules.services.player:_save() -- save the player service
             else
-                modules.libraries.logging:warning("services.player:_load", "Failed to create player class for steam_id: '%s'", player.steam_id)
+                modules.libraries.logging:warning("services.player:_verifyPlayerClasses", "Failed to create player class for steam_id: '%s'", player.steam_id)
             end
         end
         ::continue::
-    end
-    modules.services.player:_save() -- save the player service after loading
-end
-
--- internal function to save the players to gsave
-function modules.services.player:_save()
-    modules.libraries.gsave:saveService("player", self)
-end
-
--- internal function to verify if the players are online
-function modules.services.player:_verifyOnlinePlayers()
-    local onlinePlayers = {}
-
-    for _, player in pairs(server.getPlayers()) do
-        onlinePlayers[tostring(player.steam_id)] = true -- mark the player as online
-        self.peerIdIndex[tostring(player.id)] = tostring(player.steam_id) -- map peerId to steamId
-    end
-
-    for _, player in pairs(self.players) do
-        player.inGame = onlinePlayers[tostring(player.steamId)] ~= nil -- set inGame based on onlinePlayers
-        if not player.inGame and modules.addonReason == "load" then
-            player.peerId = -1
-        elseif not player.inGame and player.peerId ~= -1 then
-            self.peerIdIndex[tostring(player.peerId)] = tostring(player.steamId) -- add offline but not old save players to peerIdIndex
-        end
     end
 end
 

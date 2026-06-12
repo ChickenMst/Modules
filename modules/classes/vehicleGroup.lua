@@ -5,7 +5,7 @@ modules.classes.vehicleGroup = {} -- table of vehicle functions
 ---@param spawnTime number|nil
 ---@param loaded boolean|nil
 ---@return VehicleGroup
-function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded, despawned)
+function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loadedTime, loaded, despawned)
     ---@class VehicleGroup
     local vehicleGroup = {
         _class = "VehicleGroup",
@@ -13,6 +13,7 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
         vehicles = {}, ---@type Vehicle[]
         ownerId = owner and owner.steamId,
         spawnTime = spawnTime or server.getTimeMillisec(),
+        loadedTime = loadedTime or server.getTimeMillisec(),
         onDespawn = modules.libraries.event:create(),
         onLoaded = modules.libraries.event:create(),
         isLoaded = loaded or false,
@@ -48,6 +49,8 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
         self.vehicles[vehicle.id] = vehicle
     end
 
+    -- sets the vehicle groups editability
+    ---@param state boolean
     function vehicleGroup:setEditable(state)
         for _, vehicle in pairs(self.vehicles) do
             if not vehicle.isDespawned then
@@ -56,6 +59,8 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
         end
     end
 
+    -- sets the vehicle groups invulnerability
+    ---@param state boolean
     function vehicleGroup:setInvulnerable(state)
         for _, vehicle in pairs(self.vehicles) do
             if not vehicle.isDespawned then
@@ -64,10 +69,15 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
         end
     end
 
+    -- despawns the vehicle group
+    ---@param is_instant boolean|nil if true the vehicle group will be despawned instantly, if false it will be despawned when unloaded
     function vehicleGroup:despawn(is_instant)
         server.despawnVehicleGroup(self.groupId, is_instant or false)
     end
 
+    -- gets the vehicle groups info, this is a combined info of all vehicles in the group
+    ---@param update boolean|nil if true the vehicle info will be fetched from the server, otherwise the cached info will be returned
+    ---@return table info
     function vehicleGroup:getInfo(update)
         local info = {}
         info["characters"] = info["characters"] or {}
@@ -93,6 +103,8 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
         return info
     end
 
+    -- sets the vehicle groups tooltip text
+    ---@param text string
     function vehicleGroup:setTooltip(text)
         for _, vehicle in pairs(self.vehicles) do
             if not vehicle.isDespawned then
@@ -101,19 +113,32 @@ function modules.classes.vehicleGroup:create(group_id, owner, spawnTime, loaded,
         end
     end
 
+    -- sets the vehicle groups position
+    ---@param pos table matrix
     function vehicleGroup:setPos(pos)
         server.setGroupPos(self.groupId, pos)
     end
 
+    -- sets the vehicle groups position, will be displaced by other vehicles
+    ---@param pos table matrix
     function vehicleGroup:setPosSafe(pos)
         server.setGroupPosSafe(self.groupId, pos)
     end
 
+    -- resets the vehicle groups state, all vehicles in the group will be reset to the state they were in when they were spawned
     function vehicleGroup:resetState()
         for _, vehicle in pairs(self.vehicles) do
             if not vehicle.isDespawned then
                 vehicle:resetState()
             end
+        end
+    end
+
+    function vehicleGroup:getLoadingTime()
+        if self.isLoaded then
+            return self.loadedTime - self.spawnTime
+        else
+            return server.getTimeMillisec() - self.spawnTime
         end
     end
 
